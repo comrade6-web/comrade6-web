@@ -167,45 +167,56 @@
             "function balanceOf(address account) view returns (uint256)"
         ];
 
-        let signer, contract, usdtContract;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script>
+        const contractAddress = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
+        const usdtAddress = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+
+        const contractABI = ["function join(address _referrer, uint256 _package) external", "function totalUsers() view returns (uint256)"];
+        const usdtABI = ["function approve(address spender, uint256 amount) external returns (bool)", "function balanceOf(address account) view returns (uint256)"];
+
+        let signer, contract, usdtContract, provider;
 
         async function connectWallet() {
-            if (!window.ethereum) return alert("MetaMask not found!");
+            if (!window.ethereum) return;
             try {
-                const provider = new ethers.BrowserProvider(window.ethereum);
+                provider = new ethers.BrowserProvider(window.ethereum);
                 const accounts = await provider.send("eth_requestAccounts", []);
                 signer = await provider.getSigner();
                 
                 contract = new ethers.Contract(contractAddress, contractABI, signer);
                 usdtContract = new ethers.Contract(usdtAddress, usdtABI, signer);
 
+                // Update UI Tombol di Navbar
                 const btn = document.getElementById('connectBtn');
                 btn.innerText = accounts[0].substring(0,6) + "..." + accounts[0].substring(38);
                 btn.classList.replace('bg-black', 'bg-green-600');
                 
-                updateDashboard(accounts[0]);
-            } catch (err) { console.error(err); }
+                // Panggil update data secara paksa
+                await updateDashboard(accounts[0]);
+            } catch (err) { console.error("Koneksi gagal:", err); }
         }
 
         async function updateDashboard(address) {
+            if (!address || !usdtContract) return;
             try {
+                // Gunakan blockTag: 'latest' untuk memastikan data paling baru dari Polygon
                 const bal = await usdtContract.balanceOf(address);
                 document.getElementById('userBalance').innerText = "$" + parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
+                
                 const total = await contract.totalUsers();
                 document.getElementById('totalUsers').innerText = total.toString();
-            } catch(e) { console.log(e); }
+            } catch(e) { console.log("Dashboard update error:", e); }
         }
 
         async function joinSquad(amount) {
             const isAgreed = document.getElementById('riskAgree').checked;
-            if (!isAgreed) return alert("🛑 YOU MUST AGREE TO THE TERMS AND RISK DISCLAIMER BEFORE JOINING.");
-
+            if (!isAgreed) return alert("🛑 YOU MUST AGREE TO THE TERMS FIRST.");
             if (!signer) return connectWallet();
             
             const value = ethers.parseUnits(amount.toString(), 6);
-            
             try {
-                const finalConfirm = confirm("FINAL WARNING:\n1. Transactions are NON-REFUNDABLE.\n2. You are responsible for your own wallet security.\n3. Developers are not liable for any losses.\n\nProceed to join?");
+                const finalConfirm = confirm("Transactions are NON-REFUNDABLE. Proceed?");
                 if(!finalConfirm) return;
 
                 alert("STEP 1: Approving USDT...");
@@ -216,23 +227,39 @@
                 const tx2 = await contract.join("0x0000000000000000000000000000000000000000", value);
                 await tx2.wait();
                 
-                alert("WELCOME TO COMRADE6 SQUAD!");
+                alert("SUCCESS! Welcome to the Squad.");
                 location.reload();
             } catch(e) { alert("Transaction failed. Check your POL/USDT balance."); }
         }
 
+        // --- SISTEM DETEKSI OTOMATIS (USER-FRIENDLY) ---
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accs) => accs.length > 0 ? connectWallet() : location.reload());
+            // Jika user ganti akun, langsung sapa dan update data
+            window.ethereum.on('accountsChanged', (accs) => {
+                if (accs.length > 0) connectWallet();
+                else location.reload();
+            });
+
+            // Jika user ganti network, langsung refresh
             window.ethereum.on('chainChanged', () => location.reload());
         }
 
+        // Jalankan mesin otomatis saat halaman terbuka
         document.addEventListener("DOMContentLoaded", () => {
             if (window.ethereum) {
+                // Cek apakah user sudah pernah connect sebelumnya
                 window.ethereum.request({ method: 'eth_accounts' }).then(accs => {
                     if (accs.length > 0) connectWallet();
                 });
             }
         });
+
+        // Loop pengecekan saldo setiap 15 detik (Background Sync)
+        setInterval(() => {
+            if (signer) {
+                signer.getAddress().then(addr => updateDashboard(addr));
+            }
+        }, 15000);
     </script>
 </body>
 </html>
