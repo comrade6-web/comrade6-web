@@ -10,14 +10,15 @@
         body { font-family: 'Space Grotesk', sans-serif; background: #000; color: #fff; }
         .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
         .hidden { display: none !important; }
-        tr { border-bottom: 1px solid #111; }
+        tr { border-bottom: 1px solid #111; transition: 0.3s; }
+        tr:hover { background: rgba(59, 130, 246, 0.05); }
     </style>
 </head>
 <body>
 
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto border-b border-white/5">
         <div class="flex items-center gap-2 font-bold italic">
-            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white">6</div>
+            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white shadow-lg shadow-blue-900/20">6</div>
             <span>COMRADE6</span>
         </div>
         <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-xs font-bold uppercase hover:bg-blue-700 transition">Connect Wallet</button>
@@ -39,7 +40,7 @@
             <div class="grid md:grid-cols-3 gap-6 mb-12 text-left">
                 <div class="glass p-8 rounded-3xl border-l-4 border-blue-600">
                     <p class="text-[10px] text-gray-400 font-bold uppercase">My USDT Balance</p>
-                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500">$0.00</h3>
+                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500 tracking-tighter">$0.00</h3>
                 </div>
                 <div class="glass p-8 rounded-3xl border-l-4 border-green-600">
                     <p class="text-[10px] text-gray-400 font-bold uppercase">Referral Link</p>
@@ -48,16 +49,14 @@
             </div>
 
             <div class="glass p-10 rounded-[40px] border-t-4 border-blue-600">
-                <h2 class="text-2xl font-bold italic uppercase mb-10">Matrix Empire</h2>
+                <h2 class="text-2xl font-bold italic uppercase mb-10 tracking-widest text-blue-400 text-center">My Matrix Empire</h2>
                 <table class="w-full text-left text-sm">
-                    <thead><tr class="text-gray-600 uppercase text-[10px]"><th>Level</th><th>Status</th><th>Earnings</th></tr></thead>
+                    <thead><tr class="text-gray-600 uppercase text-[10px]"><th>Level</th><th>Progress</th><th>Earnings</th></tr></thead>
                     <tbody id="matrixRows"></tbody>
                 </table>
             </div>
         </div>
     </section>
-
-    <footer class="py-20 text-center text-[10px] text-gray-800 uppercase tracking-widest">© 2026 COMRADE6 WORLD COMMUNITY</footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
@@ -68,47 +67,66 @@
 
         let user, provider, signer, cUSDT, cSquad;
 
-        // PENGHUBUNG TOMBOL MANUAL (Lebih Stabil)
         document.getElementById('btnConnect').addEventListener('click', connect);
         document.getElementById('btnJoin').addEventListener('click', join);
         document.getElementById('btnCopy').addEventListener('click', copyRef);
 
         async function connect() {
-            if (!window.ethereum) return alert("Please install MetaMask!");
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                user = (await signer.getAddress()).toLowerCase();
-                
-                document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
-                
-                cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
-                cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)"], signer);
+            if (!window.ethereum) return alert("MetaMask!");
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            signer = provider.getSigner();
+            user = (await signer.getAddress()).toLowerCase();
+            document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
+            
+            cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
+            // Tambahkan kembali fungsi users() ke ABI
+            cSquad = new ethers.Contract(ADDR_CONTRACT, [
+                "function join(address, uint256) external", 
+                "function totalUsers() view returns (uint256)",
+                "function users(address) view returns (address, uint256, uint256, uint256)"
+            ], signer);
 
-                sync();
-            } catch (err) { console.error("Connection Failed", err); }
+            sync();
         }
 
         async function sync() {
             try {
+                // Ambil Saldo Asli
                 const balRaw = await cUSDT.balanceOf(user);
                 const bal = parseFloat(ethers.utils.formatUnits(balRaw, 6));
                 document.getElementById('txtBal').innerText = "$" + bal.toFixed(2);
 
-                // BYPASS LOGIC: Founder atau Saldo < $2
-                if (user === ADDR_FOUNDER || bal < 2) {
+                // Ambil Data Member Asli dari Smart Contract
+                const data = await cSquad.users(user);
+                const isMember = parseInt(data[1].toString()) > 0;
+                
+                if (user === ADDR_FOUNDER || isMember) {
                     document.getElementById('doorJoin').classList.add('hidden');
                     document.getElementById('doorEmpire').classList.remove('hidden');
-                    document.getElementById('mainTitle').innerHTML = "Welcome back, <br><span class='text-blue-500'>Comrade</span>";
+                    document.getElementById('mainTitle').innerHTML = "Welcome back, <br><span class='text-blue-500 uppercase'>Comrade</span>";
+                    
+                    const earns = ethers.utils.formatUnits(data[2], 6);
+                    const team = data[3].toString();
                     
                     const body = document.getElementById('matrixRows');
                     body.innerHTML = "";
-                    for(let i=1; i<=9; i++) {
-                        body.innerHTML += `<tr><td class="p-4 font-bold">Level ${i}</td><td class="p-4 text-blue-400">Progress Active</td><td class="p-4 text-green-500 font-mono">$${i==1 ? "6.00" : "0.00"}</td></tr>`;
-                    }
+                    const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
+                    
+                    caps.forEach((cap, i) => {
+                        const lvl = i + 1;
+                        // Data Real: Level 1 ambil dari teamSize, Earnings dari totalEarnings
+                        const currentCount = (lvl === 1) ? team : "0";
+                        const currentEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
+                        
+                        body.innerHTML += `<tr>
+                            <td class="p-4 font-bold text-gray-500">Level ${lvl}</td>
+                            <td class="p-4"><span class="text-blue-400 font-bold">${currentCount}</span> / ${cap.toLocaleString()}</td>
+                            <td class="p-4 text-green-500 font-bold font-mono">$${currentEarn}</td>
+                        </tr>`;
+                    });
                 }
-            } catch (e) { console.log("Sync failed, but wallet connected."); }
+            } catch (e) { console.error("Sync Error:", e); }
         }
 
         async function join() {
@@ -116,22 +134,18 @@
             const urlParams = new URLSearchParams(window.location.search);
             const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
             const amount = ethers.utils.parseUnits("6", 6);
-            
             try {
-                alert("Step 1: Approving USDT...");
                 const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
                 await tx1.wait();
-                alert("Step 2: Activating Squad...");
                 const tx2 = await cSquad.join(ref, amount);
                 await tx2.wait();
                 location.reload();
-            } catch (err) { alert("Insufficient USDT/POL Balance"); }
+            } catch (err) { alert("Fail!"); }
         }
 
         function copyRef() {
-            const link = "https://comrade6.com/?ref=" + user;
-            navigator.clipboard.writeText(link);
-            alert("Referral Link Copied!");
+            navigator.clipboard.writeText("https://comrade6.com/?ref="+user);
+            alert("Copied!");
         }
     </script>
 </body>
