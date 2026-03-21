@@ -10,7 +10,8 @@
         body { font-family: 'Space Grotesk', sans-serif; background-color: #000000; color: #ffffff; scroll-behavior: smooth; }
         .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        tr { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        tr { border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.3s; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
         th { color: #6b7280; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; padding: 15px; }
         td { padding: 15px; font-size: 13px; }
     </style>
@@ -19,13 +20,12 @@
 
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto border-b border-white/5">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl italic shadow-lg shadow-blue-900/20">6</div>
-            <span class="text-xl font-bold tracking-tighter uppercase italic">Comrade<span class="text-blue-500">6</span></span>
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl italic shadow-lg">6</div>
+            <span class="text-xl font-bold tracking-tighter uppercase italic tracking-widest">Comrade<span class="text-blue-500">6</span></span>
         </div>
         <div id="navLinks" class="hidden md:flex gap-8 text-sm font-medium text-gray-500 uppercase tracking-widest">
             <a href="#matrixSection" class="hover:text-blue-400 transition">My Empire</a>
             <a href="#faq" class="hover:text-blue-400 transition">Guide</a>
-            <a href="https://www.youtube.com/channel/UCNr4THFT-uOfy6fy22_WiIg" target="_blank" class="hover:text-blue-400 transition uppercase">YouTube</a>
         </div>
         <button id="connectBtn" onclick="connectWallet()" class="bg-blue-600 text-white px-6 py-2 rounded-full text-[10px] font-bold hover:bg-blue-700 transition uppercase tracking-widest">Connect Wallet</button>
     </nav>
@@ -34,14 +34,17 @@
         <h1 id="heroTitle" class="text-5xl md:text-8xl font-bold tracking-tighter mb-6 leading-none uppercase italic">
             Transparent <br><span class="text-blue-500 neon-text italic">Decentralized</span> Growth
         </h1>
+        <p id="heroSub" class="text-gray-400 text-sm md:text-lg mb-12 max-w-2xl mx-auto uppercase tracking-widest font-light">
+            Global Community Protocol. No Middleman. No Risk.
+        </p>
 
         <div id="userDashboard" class="hidden grid md:grid-cols-3 gap-6 mb-16 text-left">
             <div class="glass-card p-8 rounded-3xl border-l-4 border-blue-600 shadow-xl shadow-blue-900/10">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">My Wallet Balance</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">USDT Balance</p>
                 <h3 id="userBalance" class="text-4xl font-bold text-blue-500 tracking-tighter">$0.00</h3>
             </div>
             <div class="glass-card p-8 rounded-3xl border-l-4 border-white/10">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Global Community</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Global Squad</p>
                 <h3 id="totalUsers" class="text-4xl font-bold text-white tracking-tighter">0</h3>
             </div>
             <div class="glass-card p-8 rounded-3xl border-l-4 border-green-600">
@@ -54,26 +57,27 @@
         </div>
 
         <div id="matrixSection" class="hidden max-w-5xl mx-auto py-12 px-6 glass-card rounded-[40px] mb-16 border-t-4 border-blue-600 shadow-2xl">
-            <h2 class="font-bold uppercase tracking-tighter italic text-2xl mb-12 text-center">My Squad Empire</h2>
-            
-            <div class="overflow-x-auto">
+            <h2 class="font-bold uppercase tracking-tighter italic text-2xl mb-12 text-center">My Matrix Empire</h2>
+            <div class="overflow-x-auto mb-10">
                 <table class="w-full text-left">
                     <thead>
                         <tr>
                             <th>Level</th>
-                            <th>Progress (Members)</th>
-                            <th>Total Earnings</th>
+                            <th>Progress</th>
+                            <th>Cap</th>
+                            <th>Earning</th>
                         </tr>
                     </thead>
-                    <tbody id="matrixBody">
+                    <tbody id="matrixTableBody">
                         </tbody>
                 </table>
             </div>
-
-            <div class="mt-16 border-t border-white/5 pt-12 text-left">
-                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 px-4">Direct Referrals (Recent)</h3>
-                <div id="directReferrals" class="grid gap-3 px-4">
-                    <p class="text-gray-600 italic text-xs">No direct members yet. Share your link to grow.</p>
+            <div class="text-left px-4">
+                <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Account Overview</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 font-bold">
+                    <div><p class="text-[8px] text-gray-600 uppercase">Status</p><p class="text-blue-500 uppercase italic">Active Comrade</p></div>
+                    <div><p class="text-[8px] text-gray-600 uppercase">My Team</p><p id="teamSizeVal" class="text-white">0 Members</p></div>
+                    <div><p class="text-[8px] text-gray-600 uppercase italic text-green-500">Total Profit</p><p id="totalProfitVal" class="text-green-500">$0.00</p></div>
                 </div>
             </div>
         </div>
@@ -81,22 +85,22 @@
         <div id="joinArea">
             <div class="max-w-xl mx-auto mb-10 p-6 glass-card rounded-3xl border-red-900/20 text-left">
                 <div class="flex items-start gap-4">
-                    <input type="checkbox" id="riskAgree" class="mt-1 h-5 w-5 rounded border-white/10 bg-black text-blue-600 cursor-pointer">
+                    <input type="checkbox" id="riskAgree" class="mt-1 h-5 w-5 rounded border-white/10 bg-black text-blue-600">
                     <label for="riskAgree" class="text-[10px] text-gray-500 uppercase leading-relaxed font-medium cursor-pointer">
-                        <span class="text-red-500 font-bold uppercase">Disclaimer:</span> I understand that transactions are final and decentralized.
+                        Confirm: Non-Refundable $6 Activation. Decentralized Protocol.
                     </label>
                 </div>
             </div>
-            <button onclick="joinSquad(6)" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black hover:bg-blue-500 hover:text-white transition uppercase italic tracking-tighter">Join Squad - $6</button>
+            <button onclick="joinSquad(6)" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black hover:bg-blue-500 hover:text-white transition uppercase italic tracking-tighter shadow-lg shadow-white/5">Join Squad - $6</button>
         </div>
     </section>
 
     <footer class="py-20 border-t border-white/5 text-center">
-        <div class="flex justify-center gap-10 mb-8 font-bold text-[10px] tracking-widest uppercase">
-            <a href="https://www.instagram.com/comradeworldcommunity/" target="_blank" class="text-gray-500 hover:text-white transition uppercase">Instagram</a>
-            <a href="https://www.youtube.com/channel/UCNr4THFT-uOfy6fy22_WiIg" target="_blank" class="text-gray-500 hover:text-white transition uppercase">YouTube</a>
+        <p class="text-[10px] text-gray-700 uppercase tracking-[0.4em] mb-4">© 2026 COMRADE6 WORLD COMMUNITY</p>
+        <div class="flex justify-center gap-6 text-[10px] font-bold text-gray-600">
+            <a href="https://www.instagram.com/comradeworldcommunity/" class="hover:text-white">IG</a>
+            <a href="https://www.youtube.com/channel/UCNr4THFT-uOfy6fy22_WiIg" class="hover:text-white">YT</a>
         </div>
-        <p class="text-[10px] text-gray-700 uppercase tracking-[0.4em]">© 2026 COMRADE6 WORLD COMMUNITY</p>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
@@ -121,74 +125,65 @@
                 const accounts = await provider.send("eth_requestAccounts", []);
                 userAddr = accounts[0];
                 signer = await provider.getSigner();
+                
                 contract = new ethers.Contract(contractAddress, contractABI, signer);
                 usdtContract = new ethers.Contract(usdtAddress, usdtABI, signer);
-                
+
                 document.getElementById('connectBtn').innerText = userAddr.substring(0,6) + "...";
                 document.getElementById('userDashboard').classList.remove('hidden');
-                document.getElementById('navLinks').classList.remove('hidden');
-
-                checkStatus();
-                updateUI();
+                
+                // JALANKAN UPDATE UI DAN CEK STATUS BERURUTAN
+                await updateUI();
+                await runAuditCheck(); 
             } catch (err) { console.error(err); }
         }
 
-        async function checkStatus() {
+        async function runAuditCheck() {
             if (!userAddr) return;
             try {
-                const userData = await contract.users(userAddr);
-                // Founder Bypass or Active Member
-                if (userAddr.toLowerCase() === founder001 || userData[0] !== "0x0000000000000000000000000000000000000000" || parseInt(userData[1]) > 0) {
-                    switchToMemberMode(userData);
+                // BYPASS KHUSUS FOUNDER 001
+                if (userAddr.toLowerCase() === founder001) {
+                    switchToMemberMode("FOUNDER 001", "MASTER", "GLOBAL");
+                    return;
                 }
-            } catch(e) { console.log(e); }
+
+                // CHECK AKUN MEMBER (002 DST)
+                const data = await contract.users(userAddr);
+                // Indeks 1 adalah Package, Indeks 0 adalah Referrer
+                if (parseInt(data[1]) > 0 || data[0] !== "0x0000000000000000000000000000000000000000") {
+                    const profit = parseFloat(ethers.formatUnits(data[2], 6)).toFixed(2);
+                    const team = data[3].toString();
+                    switchToMemberMode("COMRADE", profit, team);
+                }
+            } catch(e) { console.log("Audit Check Failed", e); }
         }
 
-        function switchToMemberMode(data) {
+        function switchToMemberMode(label, profit, team) {
             document.getElementById('joinArea').classList.add('hidden');
             document.getElementById('matrixSection').classList.remove('hidden');
-            document.getElementById('heroTitle').innerHTML = `Welcome Back, <br><span class="text-blue-500 neon-text italic">COMRADE</span>`;
-            
-            buildMatrixTable(data);
+            document.getElementById('heroTitle').innerHTML = `Welcome Back, <br><span class="text-blue-500 neon-text italic">${label}</span>`;
+            document.getElementById('totalProfitVal').innerText = profit === "MASTER" ? "MASTER" : "$" + profit;
+            document.getElementById('teamSizeVal').innerText = team + " Members";
+            buildTable();
         }
 
-        function buildMatrixTable(data) {
-            const tableBody = document.getElementById('matrixBody');
-            const levels = [
-                { lvl: 1, cap: 10, payout: 6 },
-                { lvl: 2, cap: 100, payout: 0 },
-                { lvl: 3, cap: 1000, payout: 0 },
-                { lvl: 4, cap: 10000, payout: 0 },
-                { lvl: 5, cap: 100000, payout: 0 },
-                { lvl: 6, cap: 1000000, payout: 0 },
-                { lvl: 7, cap: 10000000, payout: 0 },
-                { lvl: 8, cap: 100000000, payout: 0 },
-                { lvl: 9, cap: "Global", payout: 0 }
+        function buildTable() {
+            const body = document.getElementById('matrixTableBody');
+            const rows = [
+                {lvl:1, cap:10}, {lvl:2, cap:100}, {lvl:3, cap:1000}, {lvl:4, cap:10000}, {lvl:5, cap:100000}, {lvl:6, cap:1000000}, {lvl:7, cap:10000000}, {lvl:8, cap:100000000}, {lvl:9, cap:"Global"}
             ];
-
-            tableBody.innerHTML = "";
-            levels.forEach(l => {
-                let row = `<tr>
-                    <td class="font-bold text-gray-400">Level ${l.lvl}</td>
-                    <td><span class="text-blue-400 font-bold">${l.lvl === 1 ? "1" : "0"}</span> / ${l.cap.toLocaleString()}</td>
-                    <td class="font-mono text-green-500">$${l.payout.toFixed(2)}</td>
+            body.innerHTML = "";
+            rows.forEach(r => {
+                body.innerHTML += `<tr>
+                    <td class="text-gray-400 font-bold uppercase">LVL ${r.lvl}</td>
+                    <td><span class="${r.lvl === 1 ? 'text-blue-500' : 'text-gray-700'} font-bold">Progress</span></td>
+                    <td class="font-mono text-gray-500">${r.cap.toLocaleString()}</td>
+                    <td class="text-green-500 font-bold">$0.00</td>
                 </tr>`;
-                tableBody.innerHTML += row;
             });
-
-            // Simulasi Detail View untuk Dompet 002 yang sudah join
-            if (userAddr.toLowerCase() === founder001) {
-                document.getElementById('directReferrals').innerHTML = `
-                    <div class="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <span class="text-[10px] font-mono text-blue-400">0x0996A...71E1 (Account 002)</span>
-                        <span class="text-[10px] text-green-500 font-bold uppercase">Active Member</span>
-                    </div>
-                `;
-            }
         }
 
         async function updateUI() {
-            if (!userAddr) return;
             const bal = await usdtContract.balanceOf(userAddr);
             document.getElementById('userBalance').innerText = "$" + parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
             const total = await contract.totalUsers();
@@ -200,26 +195,25 @@
             const input = document.getElementById('refLinkInput');
             input.select();
             navigator.clipboard.writeText(input.value);
-            alert("Referral Link Copied!");
+            alert("Link Copied!");
         }
 
         async function joinSquad(amount) {
-            if (!document.getElementById('riskAgree').checked) return alert("Agree to terms!");
+            if (!document.getElementById('riskAgree').checked) return alert("Check the agreement!");
             const urlParams = new URLSearchParams(window.location.search);
             const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
-            const value = ethers.parseUnits(amount.toString(), 6);
             try {
-                const tx1 = await usdtContract.approve(contractAddress, value);
+                const val = ethers.parseUnits(amount.toString(), 6);
+                const tx1 = await usdtContract.approve(contractAddress, val);
                 await tx1.wait();
-                const tx2 = await contract.join(ref, value);
+                const tx2 = await contract.join(ref, val);
                 await tx2.wait();
                 location.reload();
-            } catch(e) { alert("Fail."); }
+            } catch(e) { alert("Error!"); }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
             if (window.ethereum) {
-                window.ethereum.request({ method: 'eth_accounts' }).then(accs => { if (accs.length > 0) connectWallet(); });
                 window.ethereum.on('accountsChanged', () => location.reload());
             }
         });
