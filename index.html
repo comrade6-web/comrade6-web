@@ -10,19 +10,19 @@
         body { font-family: 'Space Grotesk', sans-serif; background: #000; color: #fff; }
         .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
         .hidden { display: none !important; }
-        tr { border-bottom: 1px solid #111; }
+        .syncing { opacity: 0.5; font-style: italic; font-size: 10px; }
     </style>
 </head>
 <body>
 
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto border-b border-white/5">
-        <div class="flex items-center gap-2 font-bold italic">
+        <div class="flex items-center gap-2 font-bold italic text-xl">
             <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white">6</div>
             <span>COMRADE6</span>
         </div>
         <div class="text-right">
             <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase">Connect Wallet</button>
-            <p id="globalCount" class="text-[8px] text-gray-500 mt-1 uppercase tracking-widest hidden">Global Squad: 0</p>
+            <p id="globalCount" class="text-[8px] text-blue-500 mt-1 uppercase tracking-widest hidden">Global Squad: 0</p>
         </div>
     </nav>
 
@@ -30,18 +30,18 @@
         <h1 id="mainTitle" class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-12">Transparent <br><span class="text-blue-500">Growth</span></h1>
 
         <div id="doorJoin" class="block">
-            <div class="max-w-xl mx-auto mb-10 p-6 glass rounded-3xl text-left">
+            <div class="max-w-xl mx-auto mb-10 p-6 glass rounded-3xl text-left border-red-900/20">
                 <p class="text-[10px] text-gray-500 uppercase leading-relaxed font-bold">
                     <input type="checkbox" id="checkRisk" class="mr-2"> I understand that wallet security is my responsibility. Non-Refundable.
                 </p>
             </div>
-            <button id="btnJoin" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase">ACTIVATE SQUAD - $6</button>
+            <button id="btnJoin" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase active:scale-95 transition">ACTIVATE SQUAD - $6</button>
         </div>
 
         <div id="doorEmpire" class="hidden">
             <div class="grid md:grid-cols-3 gap-6 mb-12 text-left">
                 <div class="glass p-8 rounded-3xl border-l-4 border-blue-600">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">USDT Wallet Balance</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">USDT Balance</p>
                     <h3 id="txtBal" class="text-4xl font-bold text-blue-500">$0.00</h3>
                 </div>
                 <div class="glass p-8 rounded-3xl border-l-4 border-green-600">
@@ -50,12 +50,15 @@
                 </div>
             </div>
 
-            <div class="glass p-10 rounded-[40px] border-t-4 border-blue-600 shadow-2xl">
+            <div class="glass p-10 rounded-[40px] border-t-4 border-blue-600">
                 <h2 class="text-2xl font-bold italic uppercase mb-10 text-center text-blue-400">My Matrix Empire</h2>
                 <table class="w-full text-left text-sm">
                     <thead><tr class="text-gray-600 uppercase text-[10px] border-b border-white/5"><th class="pb-4">Level</th><th class="pb-4">Squad Progress</th><th class="pb-4">Earnings</th></tr></thead>
-                    <tbody id="matrixRows"></tbody>
+                    <tbody id="matrixRows">
+                        <tr><td colspan="3" class="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-[10px]">Syncing On-Chain Data...</td></tr>
+                    </tbody>
                 </table>
+                <p id="syncMsg" class="syncing text-center mt-4 hidden">Blockchain connection lag. Retrying...</p>
             </div>
         </div>
     </section>
@@ -81,38 +84,42 @@
             document.getElementById('btnConnect').innerText = user.substring(0,6)+"...";
             
             cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
-            cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)", "function users(address) view returns (address, uint256, uint256, uint256)"], signer);
+            cSquad = new ethers.Contract(ADDR_CONTRACT, [
+                "function join(address, uint256) external", 
+                "function totalUsers() view returns (uint256)", 
+                "function users(address) view returns (address, uint256, uint256, uint256)"
+            ], signer);
+
+            // Tampilkan Dashboard Dulu (Pintu Terbuka)
+            document.getElementById('doorJoin').classList.add('hidden');
+            document.getElementById('doorEmpire').classList.remove('hidden');
 
             sync();
+            setInterval(sync, 5000); // Ketok pintu blockchain setiap 5 detik
         }
 
         async function sync() {
             try {
-                // 1. Ambil Saldo (Prioritas)
+                // 1. Balance (Cepat)
                 const balRaw = await cUSDT.balanceOf(user);
-                const bal = parseFloat(ethers.utils.formatUnits(balRaw, 6));
-                document.getElementById('txtBal').innerText = "$" + bal.toFixed(2);
+                document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Global Count
+                // 2. Global Users
                 const gUsers = await cSquad.totalUsers();
                 document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. FORCE SHOW DASHBOARD (Jika Founder atau sudah connect)
-                document.getElementById('doorJoin').classList.add('hidden');
-                document.getElementById('doorEmpire').classList.remove('hidden');
-
-                // 4. Ambil Data Matrix (Jika error, tampilkan 0 dulu agar tidak kosong)
-                try {
-                    const data = await cSquad.users(user);
-                    const team = data[3].toString();
-                    const earns = ethers.utils.formatUnits(data[2], 6);
-                    render(team, earns);
-                } catch (err) {
-                    console.log("Matrix fetch lag, using fallback");
-                    render(user === ADDR_FOUNDER ? "1" : "0", user === ADDR_FOUNDER ? "6.00" : "0.00");
-                }
-            } catch (e) { console.log("Critical sync error"); }
+                // 3. Matrix Data (Murni On-Chain)
+                const data = await cSquad.users(user);
+                const team = data[3].toString();
+                const earns = ethers.utils.formatUnits(data[2], 6);
+                
+                render(team, earns);
+                document.getElementById('syncMsg').classList.add('hidden');
+            } catch (e) { 
+                console.log("Sync lag...");
+                document.getElementById('syncMsg').classList.remove('hidden');
+            }
         }
 
         function render(team, earns) {
@@ -123,12 +130,12 @@
                 const lvl = i + 1;
                 const rowTeam = (lvl === 1) ? team : "0";
                 const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
-                body.innerHTML += `<tr><td class="p-4">Level ${lvl}</td><td class="p-4 text-blue-400">${rowTeam} / ${cap.toLocaleString()}</td><td class="p-4 text-green-500 font-mono">$${rowEarn}</td></tr>`;
+                body.innerHTML += `<tr><td class="p-4 font-bold text-gray-500 uppercase text-[11px]">Level ${lvl}</td><td class="p-4 text-blue-400 font-bold">${rowTeam} / ${cap.toLocaleString()}</td><td class="p-4 text-green-500 font-bold font-mono">$${rowEarn}</td></tr>`;
             });
         }
 
         async function join() {
-            if(!document.getElementById('checkRisk').checked) return alert("Legal check!");
+            if(!document.getElementById('checkRisk').checked) return alert("Disclaimer!");
             const urlParams = new URLSearchParams(window.location.search);
             const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
             try {
@@ -138,7 +145,7 @@
                 const tx2 = await cSquad.join(ref, amount);
                 await tx2.wait();
                 location.reload();
-            } catch (err) { alert("Failed transaction"); }
+            } catch (err) { alert("Failed"); }
         }
 
         function copyRef() {
