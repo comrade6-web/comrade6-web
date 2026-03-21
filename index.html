@@ -1,4 +1,159 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comrade6 | Transparent Decentralized Networking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .gradient-text { background: linear-gradient(90deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+
+    <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto border-b border-gray-50">
+        <div class="text-2xl font-bold tracking-tighter italic">comrade<span class="text-blue-600">6</span></div>
+        <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-500">
+            <a href="#how-it-works" class="hover:text-black transition">How it Works</a>
+            <a href="#pricing" class="hover:text-black transition">Squad Tiers</a>
+            <a href="https://polygonscan.com/address/0xC1e717690fF8B5820Af8C6a32ED6789805d4B366" target="_blank" class="hover:text-black transition">Audit</a>
+        </div>
+        <button id="connectBtn" onclick="connectWallet()" class="bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition shadow-lg shadow-gray-200">Connect Wallet</button>
+    </nav>
+
+    <section class="max-w-4xl mx-auto text-center py-24 px-6">
+        <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-none">
+            Financial Freedom. <br><span class="gradient-text">100% On-Chain.</span>
+        </h1>
+        <p class="text-xl text-gray-500 mb-12 max-w-2xl mx-auto font-medium">
+            Join a decentralized community powered by Polygon. Direct payouts, no middleman, and absolute transparency. Start your journey with just $6.
+        </p>
+
+        <div class="max-w-xl mx-auto mb-10 p-6 bg-red-50 rounded-3xl border border-red-100 text-left shadow-sm">
+            <div class="flex items-start gap-4">
+                <input type="checkbox" id="riskAgree" class="mt-1.5 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                <label for="riskAgree" class="text-xs text-gray-600 leading-relaxed cursor-pointer select-none">
+                    <span class="font-bold text-red-600 uppercase">Warning & Legal Disclaimer:</span><br>
+                    I understand all transactions are <span class="font-bold">NON-REFUNDABLE</span>. 
+                    I am solely responsible for my <span class="font-bold">MetaMask, Private Keys, and Seed Phrases</span>. 
+                    The developers and ecosystem contributors <span class="font-bold">ARE NOT LIABLE</span> for any financial loss, hacks, or user errors.
+                    By joining, I waive all legal claims against the developers.
+                </label>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-center gap-6">
+            <button onclick="joinSquad(6)" class="bg-blue-600 text-white px-10 py-5 rounded-2xl text-xl font-bold shadow-2xl shadow-blue-200 hover:scale-105 transition transform active:scale-95">Join Squad - $6</button>
+            <a href="#how-it-works" class="bg-gray-100 text-gray-800 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-200 transition text-center">Learn the Strategy</a>
+        </div>
+    </section>
+
+    <section class="max-w-5xl mx-auto px-6 -mt-10 relative z-10">
+        <div class="bg-white rounded-[40px] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.1)] p-10 border border-gray-50 flex flex-col md:flex-row justify-around items-center gap-10">
+            <div class="text-center">
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-[0.2em] mb-2">Your USDT Balance</p>
+                <h3 id="userBalance" class="text-5xl font-black text-blue-600 tracking-tighter">$0.00</h3>
+            </div>
+            <div class="h-16 w-px bg-gray-100 hidden md:block"></div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-[0.2em] mb-2">Global Community</p>
+                <h3 id="totalUsers" class="text-5xl font-black tracking-tighter">0</h3>
+            </div>
+            <div class="h-16 w-px bg-gray-100 hidden md:block"></div>
+            <div class="text-center">
+                <button class="bg-green-500 text-white px-10 py-4 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-green-600 transition shadow-lg shadow-green-100">Live Payout</button>
+            </div>
+        </div>
+        <p class="text-center mt-6 text-xs text-green-500 font-bold flex items-center justify-center gap-2">
+            <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span> SECURE CONNECTION TO POLYGON NETWORK (CHAIN 137)
+        </p>
+    </section>
+
+    <section id="how-it-works" class="py-32 bg-white px-6">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tighter">The 9-Level Profit Engine</h2>
+            <p class="text-gray-500 max-w-2xl mx-auto text-lg mb-20 font-medium">Our Smart Contract automatically splits every entry with mathematical precision. No humans, no delays, no excuses.</p>
+
+            <div class="grid md:grid-cols-3 gap-8 mb-24">
+                <div class="p-10 rounded-[32px] bg-blue-50 text-left border border-blue-100">
+                    <div class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-black text-2xl mb-8">1</div>
+                    <h4 class="text-2xl font-bold mb-4">Connect Wallet</h4>
+                    <p class="text-blue-900/60 leading-relaxed font-medium">Use MetaMask on Polygon Network. Ensure you have $6 USDT and minimal POL for gas fees.</p>
+                </div>
+                <div class="p-10 rounded-[32px] bg-purple-50 text-left border border-purple-100">
+                    <div class="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center font-black text-2xl mb-8">2</div>
+                    <h4 class="text-2xl font-bold mb-4">Instant Split</h4>
+                    <p class="text-purple-900/60 leading-relaxed font-medium">22% goes to Ecosystem development. 78% is distributed instantly to 9 generations of your uplines.</p>
+                </div>
+                <div class="p-10 rounded-[32px] bg-green-50 text-left border border-green-100">
+                    <div class="w-14 h-14 bg-green-600 text-white rounded-2xl flex items-center justify-center font-black text-2xl mb-8">3</div>
+                    <h4 class="text-2xl font-bold mb-4">Global Spillover</h4>
+                    <p class="text-green-900/60 leading-relaxed font-medium">As the community grows, empty spots in your matrix are filled automatically, even if you don't recruit.</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-white rounded-[40px] p-10 shadow-2xl overflow-hidden relative">
+                <div class="absolute top-0 right-0 p-10 opacity-10 font-black text-9xl">78%</div>
+                <h4 class="text-2xl font-bold mb-10">Reward Distribution Table</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-gray-500 border-b border-gray-800">
+                                <th class="pb-6 font-bold uppercase tracking-widest text-xs">Generation</th>
+                                <th class="pb-6 font-bold uppercase tracking-widest text-xs">Bonus %</th>
+                                <th class="pb-6 font-bold uppercase tracking-widest text-xs">Net Payout ($6)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 font-medium">
+                            <tr><td class="py-5">Levels 1 - 2</td><td class="text-blue-400">5%</td><td>$0.30 per member</td></tr>
+                            <tr><td class="py-5">Levels 3 - 4</td><td class="text-blue-400">6%</td><td>$0.36 per member</td></tr>
+                            <tr><td class="py-5">Levels 5 - 6</td><td class="text-blue-400">8%</td><td>$0.48 per member</td></tr>
+                            <tr><td class="py-5">Level 9 (The King)</td><td class="text-green-400 font-black text-xl">20%</td><td class="font-black text-xl">$1.20 per member</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="bg-gray-50 py-32 px-6">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-4xl font-black text-center mb-16 tracking-tighter">Ready to Start?</h2>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="bg-white rounded-[40px] p-12 shadow-xl border border-gray-100 flex flex-col hover:-translate-y-2 transition duration-500">
+                    <h3 class="text-2xl font-bold mb-2">Starter Squad</h3>
+                    <div class="text-6xl font-black mb-8">$6 <span class="text-lg font-bold text-gray-300">USDT</span></div>
+                    <ul class="space-y-4 mb-10 text-gray-500 flex-grow font-medium">
+                        <li class="flex items-center gap-3"><span class="text-green-500 font-bold italic">✔</span> 9 Level Earnings</li>
+                        <li class="flex items-center gap-3"><span class="text-green-500 font-bold italic">✔</span> Verified Contract</li>
+                        <li class="flex items-center gap-3 font-bold text-blue-600">★ Potential $29,000+</li>
+                    </ul>
+                    <button onclick="joinSquad(6)" class="w-full py-5 rounded-2xl bg-gray-100 text-gray-800 font-black hover:bg-gray-200 transition">ACTIVATE $6</button>
+                </div>
+                <div class="bg-white rounded-[40px] p-12 shadow-[0_50px_100px_-20px_rgba(37,99,235,0.2)] border-4 border-blue-600 flex flex-col hover:-translate-y-2 transition duration-500 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-blue-600 text-white px-12 py-2 rotate-45 translate-x-10 translate-y-6 text-[10px] font-black tracking-widest">MOST POPULAR</div>
+                    <h3 class="text-2xl font-bold mb-2">Elite Squad</h3>
+                    <div class="text-6xl font-black mb-8">$60 <span class="text-lg font-bold text-gray-300">USDT</span></div>
+                    <ul class="space-y-4 mb-10 text-gray-500 flex-grow font-medium">
+                        <li class="flex items-center gap-3"><span class="text-blue-600 font-bold italic">✔</span> 10x Direct Profit</li>
+                        <li class="flex items-center gap-3"><span class="text-blue-600 font-bold italic">✔</span> Elite Community Support</li>
+                        <li class="flex items-center gap-3 font-bold text-blue-600">★ Potential $290,000+</li>
+                    </ul>
+                    <button onclick="joinSquad(60)" class="w-full py-5 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-200 transition">ACTIVATE $60</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-20 text-center border-t border-gray-100">
+        <div class="text-2xl font-bold tracking-tighter italic mb-4">comrade<span class="text-blue-600">6</span></div>
+        <p class="text-gray-400 text-sm font-medium">© 2026 Comrade6 Ecosystem. Built for the Community.</p>
+        <p class="text-gray-300 text-[10px] mt-2 italic px-10">Smart Contract: 0xC1e717690fF8B5820Af8C6a32ED6789805d4B366</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
         const contractAddress = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
         const usdtAddress = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
@@ -15,7 +170,7 @@
         let signer, contract, usdtContract;
 
         async function connectWallet() {
-            if (!window.ethereum) return alert("Please install MetaMask!");
+            if (!window.ethereum) return alert("MetaMask not found!");
             try {
                 const provider = new ethers.BrowserProvider(window.ethereum);
                 const accounts = await provider.send("eth_requestAccounts", []);
@@ -24,75 +179,60 @@
                 contract = new ethers.Contract(contractAddress, contractABI, signer);
                 usdtContract = new ethers.Contract(usdtAddress, usdtABI, signer);
 
-                // Ganti teks tombol connect
                 const btn = document.getElementById('connectBtn');
                 btn.innerText = accounts[0].substring(0,6) + "..." + accounts[0].substring(38);
                 btn.classList.replace('bg-black', 'bg-green-600');
                 
                 updateDashboard(accounts[0]);
-            } catch (err) {
-                console.error("User rejected connection", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function updateDashboard(address) {
             try {
-                // Ambil Saldo USDT Real-Time
                 const bal = await usdtContract.balanceOf(address);
-                const formattedBal = parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
-                document.getElementById('userBalance').innerText = "$" + formattedBal;
-                
-                // Ambil Total Community dari Smart Contract
+                document.getElementById('userBalance').innerText = "$" + parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
                 const total = await contract.totalUsers();
                 document.getElementById('totalUsers').innerText = total.toString();
-            } catch(e) { 
-                console.log("Error updating dashboard:", e); 
-            }
+            } catch(e) { console.log(e); }
         }
 
         async function joinSquad(amount) {
+            const isAgreed = document.getElementById('riskAgree').checked;
+            if (!isAgreed) return alert("🛑 YOU MUST AGREE TO THE TERMS AND RISK DISCLAIMER BEFORE JOINING.");
+
             if (!signer) return connectWallet();
+            
             const value = ethers.parseUnits(amount.toString(), 6);
+            
             try {
-                alert("Step 1: Approve USDT Allowance...");
+                const finalConfirm = confirm("FINAL WARNING:\n1. Transactions are NON-REFUNDABLE.\n2. You are responsible for your own wallet security.\n3. Developers are not liable for any losses.\n\nProceed to join?");
+                if(!finalConfirm) return;
+
+                alert("STEP 1: Approving USDT...");
                 const tx1 = await usdtContract.approve(contractAddress, value);
                 await tx1.wait();
                 
-                alert("Step 2: Joining the Squad...");
+                alert("STEP 2: Signing Membership...");
                 const tx2 = await contract.join("0x0000000000000000000000000000000000000000", value);
                 await tx2.wait();
                 
-                alert("Success! Welcome to Comrade Squad.");
+                alert("WELCOME TO COMRADE6 SQUAD!");
                 location.reload();
-            } catch(e) { 
-                alert("Transaction Failed! Please check your POL and USDT balance."); 
-            }
+            } catch(e) { alert("Transaction failed. Check your POL/USDT balance."); }
         }
 
-        // --- SATPAM REAL-TIME (EVENT LISTENERS) ---
         if (window.ethereum) {
-            // Jika user ganti akun di MetaMask, otomatis update dashboard
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length > 0) {
-                    connectWallet(); 
-                } else {
-                    location.reload();
-                }
-            });
-
-            // Jika user ganti jaringan, paksa refresh
+            window.ethereum.on('accountsChanged', (accs) => accs.length > 0 ? connectWallet() : location.reload());
             window.ethereum.on('chainChanged', () => location.reload());
         }
 
-        // --- PENGGANTI WINDOW ONLOAD ---
-        // Ini memastikan tombol "hidup" saat halaman selesai loading
         document.addEventListener("DOMContentLoaded", () => {
-            console.log("Comrade6 Engine Started...");
-            // Jika user sudah pernah connect, otomatis panggil connectWallet
             if (window.ethereum) {
-                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
-                    if (accounts.length > 0) connectWallet();
+                window.ethereum.request({ method: 'eth_accounts' }).then(accs => {
+                    if (accs.length > 0) connectWallet();
                 });
             }
         });
     </script>
+</body>
+</html>
