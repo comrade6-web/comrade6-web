@@ -11,7 +11,6 @@
         .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .tree-line { width: 2px; height: 30px; background: rgba(59, 130, 246, 0.3); }
-        input:focus { outline: none; }
     </style>
 </head>
 <body>
@@ -23,7 +22,7 @@
         </div>
         <div id="navLinks" class="hidden md:flex gap-8 text-sm font-medium text-gray-500 uppercase tracking-widest">
             <a href="#how-it-works" id="strategyLink" class="hover:text-blue-400 transition">Strategy</a>
-            <a href="#faq" class="hover:text-blue-400 transition uppercase">Guide</a>
+            <a href="#faq" id="guideLink" class="hover:text-blue-400 transition uppercase">Guide</a>
             <a href="https://www.youtube.com/channel/UCNr4THFT-uOfy6fy22_WiIg" target="_blank" class="hover:text-blue-400 transition uppercase">YouTube</a>
         </div>
         <button id="connectBtn" onclick="connectWallet()" class="bg-blue-600 text-white px-6 py-2 rounded-full text-[10px] font-bold hover:bg-blue-700 transition uppercase tracking-widest">Connect Wallet</button>
@@ -37,16 +36,16 @@
             The World's Most Transparent $6 Community. Direct Payouts. No Admin Control.
         </p>
 
-        <div id="userDashboard" class="hidden grid md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto">
-            <div class="glass-card p-8 rounded-3xl text-left border-l-4 border-blue-600">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Total Payouts</p>
+        <div id="userDashboard" class="hidden grid md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto text-left">
+            <div class="glass-card p-8 rounded-3xl border-l-4 border-blue-600">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">My Balance</p>
                 <h3 id="userBalance" class="text-4xl font-bold text-blue-500 tracking-tighter">$0.00</h3>
             </div>
-            <div class="glass-card p-8 rounded-3xl text-left border-l-4 border-white/10">
+            <div class="glass-card p-8 rounded-3xl border-l-4 border-white/10">
                 <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Global Squad</p>
                 <h3 id="totalUsers" class="text-4xl font-bold text-white tracking-tighter">0</h3>
             </div>
-            <div class="glass-card p-8 rounded-3xl text-left border-l-4 border-green-600">
+            <div class="glass-card p-8 rounded-3xl border-l-4 border-green-600">
                 <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">My Referral Link</p>
                 <div class="flex flex-col gap-3">
                     <input type="text" id="refLinkInput" readonly class="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] text-blue-400 font-mono" value="...">
@@ -55,37 +54,30 @@
             </div>
         </div>
 
-        <div id="matrixSection" class="hidden max-w-4xl mx-auto py-12 px-6 glass-card rounded-[40px] mb-16 border-t-4 border-blue-600 shadow-2xl shadow-blue-900/10">
+        <div id="matrixSection" class="hidden max-w-4xl mx-auto py-12 px-6 glass-card rounded-[40px] mb-16 border-t-4 border-blue-600">
             <div class="flex justify-between items-center mb-10 px-4">
                 <h2 class="font-bold uppercase tracking-tighter italic text-xl">My Empire</h2>
-                <span id="lvl1Counter" class="bg-blue-600/20 text-blue-400 px-4 py-1 rounded-full text-[10px] font-bold border border-blue-600/30">LVL 1: 1/10</span>
+                <span id="lvl1Counter" class="bg-blue-600/20 text-blue-400 px-4 py-1 rounded-full text-[10px] font-bold">LVL 1: 1/10</span>
             </div>
-
             <div class="flex flex-col items-center">
-                <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center border-4 border-white/10 shadow-xl shadow-blue-500/20 mb-2">
-                    <span class="text-xs font-black italic uppercase">You</span>
+                <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center border-4 border-white/10 mb-2">
+                    <span class="text-xs font-black italic">YOU</span>
                 </div>
                 <div class="tree-line"></div>
-                <div class="flex gap-4 md:gap-12 mt-2">
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center border-2 border-white/20 shadow-lg shadow-green-500/20">
-                            <span class="text-[8px] font-black italic uppercase">Comrade</span>
-                        </div>
+                <div class="flex gap-10 mt-2">
+                    <div class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center border-2 border-white/20">
+                        <span class="text-[8px] font-black italic">COMRADE</span>
                     </div>
                     <div class="w-14 h-14 bg-white/5 border-2 border-dashed border-white/10 rounded-full flex items-center justify-center">
-                        <span class="text-[8px] text-gray-600 font-bold uppercase tracking-tighter">Open</span>
-                    </div>
-                    <div class="w-14 h-14 bg-white/5 border-2 border-dashed border-white/10 rounded-full flex items-center justify-center">
-                        <span class="text-[8px] text-gray-600 font-bold uppercase tracking-tighter">Open</span>
+                        <span class="text-[8px] text-gray-600 font-bold uppercase">Open</span>
                     </div>
                 </div>
             </div>
-            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 text-center border-t border-white/5 pt-10">
-                <div><p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest mb-1">Level 2</p><p class="text-xl font-bold">0</p></div>
-                <div><p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest mb-1">Level 3</p><p class="text-xl font-bold">0</p></div>
-                <div><p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest mb-1">Level 9</p><p class="text-xl font-bold">0</p></div>
-                <div><p class="text-[8px] text-blue-400 uppercase font-bold tracking-widest mb-1 italic">Total Profit</p><p id="totalProfitLabel" class="text-xl font-bold text-blue-400 tracking-tighter">$0.00</p></div>
+                <div><p class="text-[8px] text-gray-500 font-bold mb-1">LVL 2</p><p class="text-xl font-bold">0</p></div>
+                <div><p class="text-[8px] text-gray-500 font-bold mb-1">LVL 3</p><p class="text-xl font-bold">0</p></div>
+                <div><p class="text-[8px] text-gray-500 font-bold mb-1">TEAM</p><p id="myTeamSize" class="text-xl font-bold">0</p></div>
+                <div><p class="text-[8px] text-blue-400 font-bold mb-1">EARNINGS</p><p id="totalProfitLabel" class="text-xl font-bold text-blue-400">$0.00</p></div>
             </div>
         </div>
 
@@ -94,20 +86,19 @@
                 <div class="flex items-start gap-4">
                     <input type="checkbox" id="riskAgree" class="mt-1 h-5 w-5 rounded border-white/10 bg-black text-blue-600">
                     <label for="riskAgree" class="text-[10px] text-gray-500 uppercase leading-relaxed font-medium cursor-pointer">
-                        <span class="text-red-500 font-bold uppercase tracking-widest">Attention:</span> Transactions are <span class="text-white font-bold uppercase tracking-tighter">Non-Refundable</span>. Ensure your <span class="text-white font-bold italic uppercase">MetaMask Security</span>.
+                        <span class="text-red-500 font-bold uppercase">Attention:</span> Transactions are <span class="text-white font-bold uppercase">Non-Refundable</span>. Check your <span class="text-white font-bold italic uppercase">MetaMask</span>.
                     </label>
                 </div>
             </div>
-            <button id="joinBtn" onclick="joinSquad(6)" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black hover:bg-blue-500 hover:text-white transition transform active:scale-95 uppercase italic tracking-tighter">Join Squad - $6</button>
+            <button onclick="joinSquad(6)" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black hover:bg-blue-500 hover:text-white transition uppercase italic tracking-tighter">Join Squad - $6</button>
         </div>
     </section>
 
     <footer class="py-20 border-t border-white/5 text-center">
         <div class="flex justify-center gap-10 mb-8 font-bold text-[10px] tracking-widest">
-            <a href="https://www.instagram.com/comradeworldcommunity/" target="_blank" class="text-gray-500 hover:text-white transition uppercase">Instagram</a>
-            <a href="https://www.youtube.com/channel/UCNr4THFT-uOfy6fy22_WiIg" target="_blank" class="text-gray-500 hover:text-white transition uppercase">YouTube</a>
+            <a href="https://www.instagram.com/comradeworldcommunity/" target="_blank" class="text-gray-500 hover:text-white transition">INSTAGRAM</a>
+            <a href="https://www.youtube.com/channel/UCNr4THFT-uOfy6fy22_WiIg" target="_blank" class="text-gray-500 hover:text-white transition">YOUTUBE</a>
         </div>
-        <div class="text-2xl font-bold tracking-tighter italic mb-4">comrade<span class="text-blue-600">6</span></div>
         <p class="text-[10px] text-gray-700 uppercase tracking-[0.4em]">© 2026 COMRADE6 WORLD COMMUNITY</p>
     </footer>
 
@@ -116,16 +107,12 @@
         const contractAddress = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
         const usdtAddress = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         
-        // ABI Update: Tambahkan pemanggilan fungsi users untuk cek status member
         const contractABI = [
             "function join(address _referrer, uint256 _package) external", 
             "function totalUsers() view returns (uint256)",
-            "function users(address) view returns (address referrer, uint256 package, uint256 totalEarnings, uint256 teamSize)"
+            "function users(address) view returns (address, uint256, uint256, uint256)"
         ];
-        const usdtABI = [
-            "function approve(address spender, uint256 amount) external returns (bool)", 
-            "function balanceOf(address account) view returns (uint256)"
-        ];
+        const usdtABI = ["function approve(address spender, uint256 amount) external returns (bool)", "function balanceOf(address account) view returns (uint256)"];
 
         let signer, contract, usdtContract, userAddr;
 
@@ -139,43 +126,37 @@
                 contract = new ethers.Contract(contractAddress, contractABI, signer);
                 usdtContract = new ethers.Contract(usdtAddress, usdtABI, signer);
 
-                document.getElementById('connectBtn').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
+                document.getElementById('connectBtn').innerText = userAddr.substring(0,6) + "...";
                 document.getElementById('userDashboard').classList.remove('hidden');
-                document.getElementById('navLinks').classList.remove('hidden');
-
-                checkJoinStatus();
+                
+                checkStatus();
                 updateUI();
             } catch (err) { console.error(err); }
         }
 
-        async function checkJoinStatus() {
+        async function checkStatus() {
             if (!userAddr) return;
             try {
-                // SENSOR ABSOLUT: Cek apakah data dompet ini ada di mapping 'users' di Kontrak
                 const userData = await contract.users(userAddr);
-                // Jika package yang dibeli > 0 (artinya sudah join)
-                if (parseInt(userData.package) > 0) {
-                    switchToMemberMode(userData);
+                // Indeks [1] adalah package (uint256). Jika > 0 berarti sudah join.
+                if (parseInt(userData[1]) > 0) {
+                    document.getElementById('joinArea').classList.add('hidden');
+                    document.getElementById('strategyLink').classList.add('hidden');
+                    document.getElementById('matrixSection').classList.remove('hidden');
+                    document.getElementById('heroTitle').innerHTML = 'Welcome Back, <br><span class="text-blue-500 neon-text italic">COMRADE</span>';
+                    
+                    // Update Profit dari Indeks [2] (Earnings)
+                    document.getElementById('totalProfitLabel').innerText = "$" + parseFloat(ethers.formatUnits(userData[2], 6)).toFixed(2);
+                    // Update Team Size dari Indeks [3]
+                    document.getElementById('myTeamSize').innerText = userData[3].toString();
                 }
-            } catch(e) { console.log("Check Member Status Error:", e); }
-        }
-
-        function switchToMemberMode(data) {
-            document.getElementById('joinArea').classList.add('hidden');
-            document.getElementById('strategyLink').classList.add('hidden');
-            document.getElementById('matrixSection').classList.remove('hidden');
-            document.getElementById('heroTitle').innerHTML = 'Welcome Back, <br><span class="text-blue-500 neon-text italic">COMRADE</span>';
-            document.getElementById('heroSub').innerText = "Empowering the Decentralized Revolution.";
-            
-            // Update stats dari data kontrak langsung (Sombong beneran)
-            document.getElementById('totalProfitLabel').innerText = "$" + parseFloat(ethers.formatUnits(data.totalEarnings, 6)).toFixed(2);
+            } catch(e) { console.log("Check Status Error", e); }
         }
 
         async function updateUI() {
             if (!userAddr) return;
             const bal = await usdtContract.balanceOf(userAddr);
             document.getElementById('userBalance').innerText = "$" + parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
-            
             const total = await contract.totalUsers();
             document.getElementById('totalUsers').innerText = total.toString();
             document.getElementById('refLinkInput').value = `https://comrade6.com/?ref=${userAddr}`;
@@ -190,21 +171,16 @@
 
         async function joinSquad(amount) {
             if (!document.getElementById('riskAgree').checked) return alert("Check the agreement first!");
-            if (!signer) return connectWallet();
-            
             const urlParams = new URLSearchParams(window.location.search);
             const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
             const value = ethers.parseUnits(amount.toString(), 6);
-            
             try {
-                alert("STEP 1: Approving USDT...");
                 const tx1 = await usdtContract.approve(contractAddress, value);
                 await tx1.wait();
-                alert("STEP 2: Signing Membership...");
                 const tx2 = await contract.join(ref, value);
                 await tx2.wait();
                 location.reload();
-            } catch(e) { alert("Transaction Failed. Check Balance."); }
+            } catch(e) { alert("Transaction Failed."); }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
