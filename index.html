@@ -1,99 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comrade6 | The Era of Economic Transparency</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
-</head>
-<body class="bg-white text-gray-900">
-
-    <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto">
-        <div class="text-2xl font-bold tracking-tighter">comrade<span class="text-blue-600">6</span></div>
-        <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-500">
-            <a href="#" class="hover:text-black">Concept</a>
-            <a href="#" class="hover:text-black">Audit</a>
-            <a href="#" class="hover:text-black">Community</a>
-        </div>
-        <button id="connectBtn" onclick="connectWallet()" class="bg-black text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition">Connect Wallet</button>
-    </nav>
-
-    <section class="max-w-4xl mx-auto text-center py-20 px-6">
-        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6">The Future of Networking <br><span class="text-blue-600">100% On-Chain.</span></h1>
-        <p class="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
-            No fake promises. No admin holding your funds. $6 Entry. 
-            Automatic distribution via Polygon Smart Contract.
-        </p>
-        <div class="flex flex-col md:flex-row justify-center gap-4">
-            <button onclick="joinSquad(6)" class="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg shadow-blue-200 hover:bg-blue-700">Join Squad - $6</button>
-            <button class="bg-gray-100 text-gray-800 px-8 py-4 rounded-xl text-lg font-bold hover:bg-gray-200">View Audit Report</button>
-        </div>
-    </section>
-
-    <section class="max-w-4xl mx-auto px-6 -mt-10 relative z-10">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <p class="text-sm text-gray-400 font-semibold uppercase tracking-wider">Available Balance</p>
-                <h3 id="userBalance" class="text-4xl font-bold text-blue-600 tracking-tight">$0.00 <span class="text-lg text-gray-300">USDT</span></h3>
-            </div>
-            <div class="h-10 w-px bg-gray-100 hidden md:block"></div>
-            <div class="text-center md:text-left">
-                <p class="text-sm text-gray-400 font-semibold uppercase tracking-wider">Total Community</p>
-                <h3 id="totalUsers" class="text-4xl font-bold">0 <span class="text-lg text-gray-300 text-sm italic font-normal">Members</span></h3>
-            </div>
-            <button class="w-full md:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-100">Withdraw Now</button>
-        </div>
-        <p class="text-center mt-4 text-xs text-green-500 flex items-center justify-center gap-1">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live Connection to Polygon Network
-        </p>
-    </section>
-
-    <section class="bg-gray-50 pt-32 pb-20 px-6 -mt-20">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">Choose Your Growth Path</h2>
-            <p class="text-center text-gray-500 mb-16">Same transparency, different profit potential.</p>
-            
-            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 flex flex-col hover:scale-105 transition duration-300">
-                    <div class="mb-8">
-                        <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-xs font-bold uppercase">Starter</span>
-                        <h3 class="text-2xl font-bold mt-4 text-gray-800 tracking-tight text-4xl">comrade<span class="text-blue-600">6</span></h3>
-                        <p class="text-gray-400 mt-2">For beginners & global reach.</p>
-                    </div>
-                    <div class="text-5xl font-extrabold mb-8">$6 <span class="text-lg font-normal text-gray-300">USDT</span></div>
-                    <ul class="space-y-4 mb-8 text-gray-600 flex-grow">
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> 9 Level Distribution</li>
-                        <li class="flex items-center gap-2"><span class="text-green-500">✔</span> Low Entry Risk</li>
-                        <li class="flex items-center gap-2 font-bold text-blue-600">★ Potential $29,000+</li>
-                    </ul>
-                    <button onclick="joinSquad(6)" class="w-full py-4 rounded-2xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition">Start with $6</button>
-                </div>
-
-                <div class="bg-white rounded-3xl shadow-2xl border-2 border-blue-600 p-8 flex flex-col relative overflow-hidden hover:scale-105 transition duration-300">
-                    <div class="absolute top-0 right-0 bg-blue-600 text-white px-8 py-1 rotate-45 translate-x-6 translate-y-4 text-xs font-bold">PRO</div>
-                    <div class="mb-8">
-                        <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase">Elite</span>
-                        <h3 class="text-2xl font-bold mt-4 text-gray-800 tracking-tight text-4xl">comrade<span class="text-blue-600">60</span></h3>
-                        <p class="text-gray-400 mt-2">For serious Network Builders.</p>
-                    </div>
-                    <div class="text-5xl font-extrabold mb-8">$60 <span class="text-lg font-normal text-gray-300">USDT</span></div>
-                    <ul class="space-y-4 mb-8 text-gray-600 flex-grow">
-                        <li class="flex items-center gap-2"><span class="text-blue-600">✔</span> 9 Level (10x Profit)</li>
-                        <li class="flex items-center gap-2"><span class="text-blue-600">✔</span> Exclusive Support</li>
-                        <li class="flex items-center gap-2 font-bold text-blue-600">★ Potential $290,000+</li>
-                    </ul>
-                    <button onclick="joinSquad(60)" class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Go Elite $60</button>
-                </div>
-            </div>
-            <p class="text-center mt-12 text-sm text-gray-400 italic">
-                *Fixed distribution: 78% Community, 22% Ecosystem Fee.
-            </p>
-        </div>
-    </section>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script>
         const contractAddress = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
         const usdtAddress = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
@@ -111,42 +16,83 @@
 
         async function connectWallet() {
             if (!window.ethereum) return alert("Please install MetaMask!");
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const accounts = await provider.send("eth_requestAccounts", []);
-            signer = await provider.getSigner();
-            
-            contract = new ethers.Contract(contractAddress, contractABI, signer);
-            usdtContract = new ethers.Contract(usdtAddress, usdtABI, signer);
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                signer = await provider.getSigner();
+                
+                contract = new ethers.Contract(contractAddress, contractABI, signer);
+                usdtContract = new ethers.Contract(usdtAddress, usdtABI, signer);
 
-            document.getElementById('connectBtn').innerText = accounts[0].substring(0,6) + "..." + accounts[0].substring(38);
-            document.getElementById('connectBtn').classList.replace('bg-black', 'bg-green-600');
-            
-            updateDashboard(accounts[0]);
+                // Ganti teks tombol connect
+                const btn = document.getElementById('connectBtn');
+                btn.innerText = accounts[0].substring(0,6) + "..." + accounts[0].substring(38);
+                btn.classList.replace('bg-black', 'bg-green-600');
+                
+                updateDashboard(accounts[0]);
+            } catch (err) {
+                console.error("User rejected connection", err);
+            }
         }
 
         async function updateDashboard(address) {
             try {
+                // Ambil Saldo USDT Real-Time
                 const bal = await usdtContract.balanceOf(address);
-                document.getElementById('userBalance').innerText = "$" + parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
+                const formattedBal = parseFloat(ethers.formatUnits(bal, 6)).toFixed(2);
+                document.getElementById('userBalance').innerText = "$" + formattedBal;
+                
+                // Ambil Total Community dari Smart Contract
                 const total = await contract.totalUsers();
                 document.getElementById('totalUsers').innerText = total.toString();
-            } catch(e) { console.log(e) }
+            } catch(e) { 
+                console.log("Error updating dashboard:", e); 
+            }
         }
 
         async function joinSquad(amount) {
             if (!signer) return connectWallet();
             const value = ethers.parseUnits(amount.toString(), 6);
             try {
-                alert("Step 1: Approve USDT...");
+                alert("Step 1: Approve USDT Allowance...");
                 const tx1 = await usdtContract.approve(contractAddress, value);
                 await tx1.wait();
-                alert("Step 2: Confirm Join...");
+                
+                alert("Step 2: Joining the Squad...");
                 const tx2 = await contract.join("0x0000000000000000000000000000000000000000", value);
                 await tx2.wait();
-                alert("Success! Welcome to the Squad.");
+                
+                alert("Success! Welcome to Comrade Squad.");
                 location.reload();
-            } catch(e) { alert("Transaction Failed!"); }
+            } catch(e) { 
+                alert("Transaction Failed! Please check your POL and USDT balance."); 
+            }
         }
+
+        // --- SATPAM REAL-TIME (EVENT LISTENERS) ---
+        if (window.ethereum) {
+            // Jika user ganti akun di MetaMask, otomatis update dashboard
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    connectWallet(); 
+                } else {
+                    location.reload();
+                }
+            });
+
+            // Jika user ganti jaringan, paksa refresh
+            window.ethereum.on('chainChanged', () => location.reload());
+        }
+
+        // --- PENGGANTI WINDOW ONLOAD ---
+        // Ini memastikan tombol "hidup" saat halaman selesai loading
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Comrade6 Engine Started...");
+            // Jika user sudah pernah connect, otomatis panggil connectWallet
+            if (window.ethereum) {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) connectWallet();
+                });
+            }
+        });
     </script>
-</body>
-</html>
