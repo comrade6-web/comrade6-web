@@ -8,72 +8,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Space Grotesk', sans-serif; background: #000; color: #fff; }
-        .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
+        .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
         .hidden { display: none !important; }
-        tr { border-bottom: 1px solid #111; transition: 0.3s; }
-        tr:hover { background: rgba(59, 130, 246, 0.05); }
-        .neon-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        tr { border-bottom: 1px solid #111; }
     </style>
 </head>
 <body>
 
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto border-b border-white/5">
         <div class="flex items-center gap-2 font-bold italic">
-            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white shadow-lg shadow-blue-900/20">6</div>
-            <span class="tracking-tighter uppercase text-xl">COMRADE<span class="text-blue-500">6</span></span>
+            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white">6</div>
+            <span>COMRADE6</span>
         </div>
         <div class="text-right">
-            <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition">Connect Wallet</button>
+            <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase">Connect Wallet</button>
             <p id="globalCount" class="text-[8px] text-gray-500 mt-1 uppercase tracking-widest hidden">Global Squad: 0</p>
         </div>
     </nav>
 
     <section class="max-w-5xl mx-auto text-center py-12 px-6">
-        <h1 id="mainTitle" class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-12">Transparent <br><span class="text-blue-500 neon-glow">Growth</span></h1>
+        <h1 id="mainTitle" class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-12">Transparent <br><span class="text-blue-500">Growth</span></h1>
 
         <div id="doorJoin" class="block">
-            <div class="max-w-xl mx-auto mb-10 p-6 glass rounded-3xl text-left border-red-900/20">
+            <div class="max-w-xl mx-auto mb-10 p-6 glass rounded-3xl text-left">
                 <p class="text-[10px] text-gray-500 uppercase leading-relaxed font-bold">
-                    <input type="checkbox" id="checkRisk" class="mr-2"> Legal Disclaimer: I understand this is a DECENTRALIZED PROTOCOL. Wallet security is my responsibility. Non-Refundable.
+                    <input type="checkbox" id="checkRisk" class="mr-2"> I understand that wallet security is my responsibility. Non-Refundable.
                 </p>
             </div>
-            <button id="btnJoin" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase hover:bg-blue-500 hover:text-white transition transform active:scale-95">ACTIVATE SQUAD - $6</button>
+            <button id="btnJoin" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase">ACTIVATE SQUAD - $6</button>
         </div>
 
         <div id="doorEmpire" class="hidden">
             <div class="grid md:grid-cols-3 gap-6 mb-12 text-left">
                 <div class="glass p-8 rounded-3xl border-l-4 border-blue-600">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">USDT Wallet Balance</p>
-                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500 tracking-tighter">$0.00</h3>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">USDT Wallet Balance</p>
+                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500">$0.00</h3>
                 </div>
                 <div class="glass p-8 rounded-3xl border-l-4 border-green-600">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Your Referral Link</p>
-                    <button id="btnCopy" class="mt-2 w-full bg-blue-600 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition">Copy Referral Link</button>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Referral Link</p>
+                    <button id="btnCopy" class="mt-2 w-full bg-blue-600 py-3 rounded-xl text-[10px] font-bold uppercase">Copy Link</button>
                 </div>
             </div>
 
             <div class="glass p-10 rounded-[40px] border-t-4 border-blue-600 shadow-2xl">
-                <h2 class="text-2xl font-bold italic uppercase mb-10 text-center tracking-widest text-blue-400">My Matrix Empire</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="text-gray-600 uppercase text-[10px] tracking-widest border-b border-white/5">
-                                <th class="pb-4">Level</th>
-                                <th class="pb-4">Squad Progress</th>
-                                <th class="pb-4">Earnings</th>
-                            </tr>
-                        </thead>
-                        <tbody id="matrixRows"></tbody>
-                    </table>
-                </div>
+                <h2 class="text-2xl font-bold italic uppercase mb-10 text-center text-blue-400">My Matrix Empire</h2>
+                <table class="w-full text-left text-sm">
+                    <thead><tr class="text-gray-600 uppercase text-[10px] border-b border-white/5"><th class="pb-4">Level</th><th class="pb-4">Squad Progress</th><th class="pb-4">Earnings</th></tr></thead>
+                    <tbody id="matrixRows"></tbody>
+                </table>
             </div>
         </div>
     </section>
 
-    <footer class="py-20 text-center text-[10px] text-gray-800 uppercase tracking-widest">© 2026 COMRADE6 WORLD COMMUNITY</footer>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-
     <script>
         const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
         const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
@@ -86,103 +73,77 @@
         document.getElementById('btnCopy').addEventListener('click', copyRef);
 
         async function connect() {
-            if (!window.ethereum) return alert("Please install MetaMask!");
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                user = (await signer.getAddress()).toLowerCase();
-                
-                document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
-                
-                cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
-                cSquad = new ethers.Contract(ADDR_CONTRACT, [
-                    "function join(address, uint256) external", 
-                    "function totalUsers() view returns (uint256)",
-                    "function users(address) view returns (address, uint256, uint256, uint256)"
-                ], signer);
+            if (!window.ethereum) return alert("MetaMask!");
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            signer = provider.getSigner();
+            user = (await signer.getAddress()).toLowerCase();
+            document.getElementById('btnConnect').innerText = user.substring(0,6)+"...";
+            
+            cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
+            cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)", "function users(address) view returns (address, uint256, uint256, uint256)"], signer);
 
-                sync();
-                // Auto-refresh setiap 10 detik
-                setInterval(sync, 10000);
-            } catch (err) { console.error("Connection Failed", err); }
+            sync();
         }
 
         async function sync() {
             try {
-                // 1. Get Global Stats
-                const globalUsers = await cSquad.totalUsers();
-                document.getElementById('globalCount').innerText = "Global Squad: " + globalUsers.toString();
-                document.getElementById('globalCount').classList.remove('hidden');
-
-                // 2. Get Personal Balance
+                // 1. Ambil Saldo (Prioritas)
                 const balRaw = await cUSDT.balanceOf(user);
                 const bal = parseFloat(ethers.utils.formatUnits(balRaw, 6));
                 document.getElementById('txtBal').innerText = "$" + bal.toFixed(2);
 
-                // 3. Get Matrix Data (The Earnings Sync)
-                const userData = await cSquad.users(user);
-                const isMember = parseInt(userData[1].toString()) > 0;
-                
-                if (user === ADDR_FOUNDER || isMember || bal < 2) {
-                    document.getElementById('doorJoin').classList.add('hidden');
-                    document.getElementById('doorEmpire').classList.remove('hidden');
-                    document.getElementById('mainTitle').innerHTML = "Welcome back, <br><span class='text-blue-500 uppercase neon-glow'>Comrade</span>";
-                    
-                    // REAL DATA SYNC
-                    const totalEarnings = ethers.utils.formatUnits(userData[2], 6);
-                    const teamSize = userData[3].toString();
+                // 2. Global Count
+                const gUsers = await cSquad.totalUsers();
+                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
+                document.getElementById('globalCount').classList.remove('hidden');
 
-                    renderTable(teamSize, totalEarnings);
+                // 3. FORCE SHOW DASHBOARD (Jika Founder atau sudah connect)
+                document.getElementById('doorJoin').classList.add('hidden');
+                document.getElementById('doorEmpire').classList.remove('hidden');
+
+                // 4. Ambil Data Matrix (Jika error, tampilkan 0 dulu agar tidak kosong)
+                try {
+                    const data = await cSquad.users(user);
+                    const team = data[3].toString();
+                    const earns = ethers.utils.formatUnits(data[2], 6);
+                    render(team, earns);
+                } catch (err) {
+                    console.log("Matrix fetch lag, using fallback");
+                    render(user === ADDR_FOUNDER ? "1" : "0", user === ADDR_FOUNDER ? "6.00" : "0.00");
                 }
-            } catch (e) { 
-                console.log("Sync failed, retrying..."); 
-                // Founder hard-bypass jika RPC Polygon lag
-                if (user === ADDR_FOUNDER) {
-                    document.getElementById('doorJoin').classList.add('hidden');
-                    document.getElementById('doorEmpire').classList.remove('hidden');
-                }
-            }
+            } catch (e) { console.log("Critical sync error"); }
         }
 
-        function renderTable(team, earns) {
+        function render(team, earns) {
             const body = document.getElementById('matrixRows');
             body.innerHTML = "";
             const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
-            
             caps.forEach((cap, i) => {
                 const lvl = i + 1;
-                // Kita tampilkan data Real di Level 1, Level lainnya masih 0 (karena kontrak hanya lacak direct teamSize di index 3)
-                const currentCount = (lvl === 1) ? team : "0";
-                const currentEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
-                
-                body.innerHTML += `<tr>
-                    <td class="p-4 font-bold text-gray-500 uppercase text-[11px]">Level ${lvl}</td>
-                    <td class="p-4"><span class="text-blue-400 font-bold">${currentCount}</span> / ${typeof cap === 'number' ? cap.toLocaleString() : cap}</td>
-                    <td class="p-4 text-green-500 font-bold font-mono">$${currentEarn}</td>
-                </tr>`;
+                const rowTeam = (lvl === 1) ? team : "0";
+                const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
+                body.innerHTML += `<tr><td class="p-4">Level ${lvl}</td><td class="p-4 text-blue-400">${rowTeam} / ${cap.toLocaleString()}</td><td class="p-4 text-green-500 font-mono">$${rowEarn}</td></tr>`;
             });
         }
 
         async function join() {
-            if(!document.getElementById('checkRisk').checked) return alert("Please check the legal agreement!");
+            if(!document.getElementById('checkRisk').checked) return alert("Legal check!");
             const urlParams = new URLSearchParams(window.location.search);
             const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
-            const amount = ethers.utils.parseUnits("6", 6);
-            
             try {
+                const amount = ethers.utils.parseUnits("6", 6);
                 const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
                 await tx1.wait();
                 const tx2 = await cSquad.join(ref, amount);
                 await tx2.wait();
                 location.reload();
-            } catch (err) { alert("Transaction failed. Check your USDT/POL balance."); }
+            } catch (err) { alert("Failed transaction"); }
         }
 
         function copyRef() {
-            const link = "https://comrade6.com/?ref=" + user;
-            navigator.clipboard.writeText(link);
-            alert("Referral Link Copied!");
+            navigator.clipboard.writeText("https://comrade6.com/?ref=" + user);
+            alert("Copied!");
         }
     </script>
 </body>
