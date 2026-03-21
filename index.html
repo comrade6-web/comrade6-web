@@ -99,3 +99,55 @@
             </p>
         </div>
     </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script>
+        const contractAddress = "0x...SEGERA_HADIR..."; // Alamat Contract kita nanti
+        const usdtAddress = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"; // USDT Polygon Resmi
+
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert("Waduh, MetaMask belum terpasang, Bro! Install dulu ya.");
+                return;
+            }
+
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                
+                // Minta izin akses akun
+                const accounts = await provider.send("eth_requestAccounts", []);
+                const address = accounts[0];
+                
+                // Cek apakah di Jaringan Polygon (ID: 137)
+                const network = await provider.getNetwork();
+                if (network.chainId !== 137n) {
+                    alert("Pindah ke jaringan Polygon dulu, Founder!");
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x89' }], // 137 in hex
+                    });
+                }
+
+                // Update Tampilan Tombol "Connect Wallet"
+                const btn = document.querySelector('button:contains("Connect Wallet"), button:contains("0x")');
+                if (btn) {
+                    btn.innerText = address.substring(0, 6) + "..." + address.substring(38);
+                    btn.classList.replace('bg-black', 'bg-green-600');
+                }
+
+                console.log("Connected to:", address);
+            } catch (error) {
+                console.error("User menolak koneksi:", error);
+            }
+        }
+
+        // Fungsi pembantu untuk mencari text di button (Tailwind compatible)
+        window.onload = () => {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                if (btn.innerText.includes("Connect Wallet")) {
+                    btn.onclick = connectWallet;
+                }
+            });
+        };
+    </script>
+</body>
