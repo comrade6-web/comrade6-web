@@ -20,7 +20,7 @@
             <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white">6</div>
             <span>COMRADE6</span>
         </div>
-        <button id="btnConnect" onclick="connect()" class="bg-blue-600 px-6 py-2 rounded-full text-xs font-bold uppercase">Connect Wallet</button>
+        <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-xs font-bold uppercase hover:bg-blue-700 transition">Connect Wallet</button>
     </nav>
 
     <section class="max-w-5xl mx-auto text-center py-12 px-6">
@@ -32,18 +32,18 @@
                     <input type="checkbox" id="checkRisk" class="mr-2"> I understand that this is a DECENTRALIZED PROTOCOL. Wallet security is my responsibility. Non-Refundable.
                 </p>
             </div>
-            <button onclick="join()" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase">ACTIVATE SQUAD - $6</button>
+            <button id="btnJoin" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase hover:bg-blue-500 hover:text-white transition">ACTIVATE SQUAD - $6</button>
         </div>
 
         <div id="doorEmpire" class="hidden">
             <div class="grid md:grid-cols-3 gap-6 mb-12 text-left">
                 <div class="glass p-8 rounded-3xl border-l-4 border-blue-600">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">My Balance</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">My USDT Balance</p>
                     <h3 id="txtBal" class="text-4xl font-bold text-blue-500">$0.00</h3>
                 </div>
                 <div class="glass p-8 rounded-3xl border-l-4 border-green-600">
                     <p class="text-[10px] text-gray-400 font-bold uppercase">Referral Link</p>
-                    <button onclick="copyRef()" class="mt-2 w-full bg-blue-600 py-2 rounded-lg text-[10px] font-bold uppercase">Copy Link</button>
+                    <button id="btnCopy" class="mt-2 w-full bg-blue-600 py-2 rounded-lg text-[10px] font-bold uppercase">Copy Referral Link</button>
                 </div>
             </div>
 
@@ -57,7 +57,10 @@
         </div>
     </section>
 
+    <footer class="py-20 text-center text-[10px] text-gray-800 uppercase tracking-widest">© 2026 COMRADE6 WORLD COMMUNITY</footer>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
     <script>
         const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
         const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
@@ -65,39 +68,47 @@
 
         let user, provider, signer, cUSDT, cSquad;
 
-        async function connect() {
-            if(!window.ethereum) return alert("MetaMask!");
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            signer = provider.getSigner();
-            user = (await signer.getAddress()).toLowerCase();
-            
-            document.getElementById('btnConnect').innerText = user.substring(0,6)+"...";
-            
-            cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
-            cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)"], signer);
+        // PENGHUBUNG TOMBOL MANUAL (Lebih Stabil)
+        document.getElementById('btnConnect').addEventListener('click', connect);
+        document.getElementById('btnJoin').addEventListener('click', join);
+        document.getElementById('btnCopy').addEventListener('click', copyRef);
 
-            sync();
+        async function connect() {
+            if (!window.ethereum) return alert("Please install MetaMask!");
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                user = (await signer.getAddress()).toLowerCase();
+                
+                document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
+                
+                cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
+                cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)"], signer);
+
+                sync();
+            } catch (err) { console.error("Connection Failed", err); }
         }
 
         async function sync() {
-            const balRaw = await cUSDT.balanceOf(user);
-            const bal = parseFloat(ethers.utils.formatUnits(balRaw, 6));
-            document.getElementById('txtBal').innerText = "$" + bal.toFixed(2);
+            try {
+                const balRaw = await cUSDT.balanceOf(user);
+                const bal = parseFloat(ethers.utils.formatUnits(balRaw, 6));
+                document.getElementById('txtBal').innerText = "$" + bal.toFixed(2);
 
-            // LOGIKA PEMBUKA PINTU: 
-            // Jika Founder ATAU Saldo di bawah $2 (berarti sudah bayar $6)
-            if (user === ADDR_FOUNDER || bal < 2) {
-                document.getElementById('doorJoin').classList.add('hidden');
-                document.getElementById('doorEmpire').classList.remove('hidden');
-                document.getElementById('mainTitle').innerHTML = "Welcome back, <br><span class="text-blue-500 uppercase">Comrade</span>";
-                
-                const body = document.getElementById('matrixRows');
-                body.innerHTML = "";
-                for(let i=1; i<=9; i++) {
-                    body.innerHTML += `<tr><td class="p-4 font-bold">Level ${i}</td><td class="p-4 text-blue-400">Progress</td><td class="p-4 text-green-500 font-mono">$${i==1 ? "6.00" : "0.00"}</td></tr>`;
+                // BYPASS LOGIC: Founder atau Saldo < $2
+                if (user === ADDR_FOUNDER || bal < 2) {
+                    document.getElementById('doorJoin').classList.add('hidden');
+                    document.getElementById('doorEmpire').classList.remove('hidden');
+                    document.getElementById('mainTitle').innerHTML = "Welcome back, <br><span class='text-blue-500'>Comrade</span>";
+                    
+                    const body = document.getElementById('matrixRows');
+                    body.innerHTML = "";
+                    for(let i=1; i<=9; i++) {
+                        body.innerHTML += `<tr><td class="p-4 font-bold">Level ${i}</td><td class="p-4 text-blue-400">Progress Active</td><td class="p-4 text-green-500 font-mono">$${i==1 ? "6.00" : "0.00"}</td></tr>`;
+                    }
                 }
-            }
+            } catch (e) { console.log("Sync failed, but wallet connected."); }
         }
 
         async function join() {
@@ -106,16 +117,21 @@
             const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
             const amount = ethers.utils.parseUnits("6", 6);
             
-            const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
-            await tx1.wait();
-            const tx2 = await cSquad.join(ref, amount);
-            await tx2.wait();
-            location.reload();
+            try {
+                alert("Step 1: Approving USDT...");
+                const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
+                await tx1.wait();
+                alert("Step 2: Activating Squad...");
+                const tx2 = await cSquad.join(ref, amount);
+                await tx2.wait();
+                location.reload();
+            } catch (err) { alert("Insufficient USDT/POL Balance"); }
         }
 
         function copyRef() {
-            navigator.clipboard.writeText("https://comrade6.com/?ref="+user);
-            alert("Copied!");
+            const link = "https://comrade6.com/?ref=" + user;
+            navigator.clipboard.writeText(link);
+            alert("Referral Link Copied!");
         }
     </script>
 </body>
