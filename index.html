@@ -8,31 +8,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Space Grotesk', sans-serif; background: #000; color: #fff; }
-        .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
         .hidden { display: none !important; }
+        tr { border-bottom: 1px solid #111; transition: 0.3s; }
+        tr:hover { background: rgba(59, 130, 246, 0.05); }
         .syncing { opacity: 0.5; font-style: italic; font-size: 10px; }
+        .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body>
 
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto border-b border-white/5">
         <div class="flex items-center gap-2 font-bold italic text-xl">
-            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white">6</div>
-            <span>COMRADE6</span>
+            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white shadow-lg shadow-blue-900/20">6</div>
+            <span class="tracking-tighter uppercase">COMRADE<span class="text-blue-500">6</span></span>
         </div>
         <div class="text-right">
-            <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase">Connect Wallet</button>
+            <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition">Connect Wallet</button>
             <p id="globalCount" class="text-[8px] text-blue-500 mt-1 uppercase tracking-widest hidden">Global Squad: 0</p>
         </div>
     </nav>
 
     <section class="max-w-5xl mx-auto text-center py-12 px-6">
-        <h1 id="mainTitle" class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-12">Transparent <br><span class="text-blue-500">Growth</span></h1>
+        <h1 id="mainTitle" class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-12">Transparent <br><span class="text-blue-500 neon-text">Growth</span></h1>
 
         <div id="doorJoin" class="block">
             <div class="max-w-xl mx-auto mb-10 p-6 glass rounded-3xl text-left border-red-900/20">
                 <p class="text-[10px] text-gray-500 uppercase leading-relaxed font-bold">
-                    <input type="checkbox" id="checkRisk" class="mr-2"> I understand that wallet security is my responsibility. Non-Refundable.
+                    <input type="checkbox" id="checkRisk" class="mr-2 cursor-pointer"> Legal Disclaimer: I understand this is a DECENTRALIZED PROTOCOL. Wallet security is my responsibility. Non-Refundable.
                 </p>
             </div>
             <button id="btnJoin" class="bg-white text-black px-12 py-5 rounded-2xl text-2xl font-black italic uppercase active:scale-95 transition">ACTIVATE SQUAD - $6</button>
@@ -41,132 +44,163 @@
         <div id="doorEmpire" class="hidden">
             <div class="grid md:grid-cols-3 gap-6 mb-12 text-left">
                 <div class="glass p-8 rounded-3xl border-l-4 border-blue-600">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">USDT Balance</p>
-                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500">$0.00</h3>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">USDT Balance</p>
+                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500 tracking-tighter">$0.00</h3>
                 </div>
                 <div class="glass p-8 rounded-3xl border-l-4 border-green-600">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Referral Link</p>
-                    <button id="btnCopy" class="mt-2 w-full bg-blue-600 py-3 rounded-xl text-[10px] font-bold uppercase">Copy Link</button>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Referral Link</p>
+                    <button id="btnCopy" class="mt-2 w-full bg-blue-600 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition">Copy Referral Link</button>
                 </div>
             </div>
 
-            <div class="glass p-10 rounded-[40px] border-t-4 border-blue-600">
-                <h2 class="text-2xl font-bold italic uppercase mb-10 text-center text-blue-400">My Matrix Empire</h2>
-                <table class="w-full text-left text-sm">
-                    <thead><tr class="text-gray-600 uppercase text-[10px] border-b border-white/5"><th class="pb-4">Level</th><th class="pb-4">Squad Progress</th><th class="pb-4">Earnings</th></tr></thead>
-                    <tbody id="matrixRows">
-                        <tr><td colspan="3" class="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-[10px]">Syncing On-Chain Data...</td></tr>
-                    </tbody>
-                </table>
-                <p id="syncMsg" class="syncing text-center mt-4 hidden">Blockchain connection lag. Retrying...</p>
+            <div class="glass p-10 rounded-[40px] border-t-4 border-blue-600 shadow-2xl">
+                <h2 class="text-2xl font-bold italic uppercase mb-10 text-center text-blue-400 tracking-widest">My Matrix Empire</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-gray-600 uppercase text-[10px] border-b border-white/5 tracking-widest">
+                                <th class="pb-4">Level</th>
+                                <th class="pb-4">Squad Progress</th>
+                                <th class="pb-4">Earnings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrixRows">
+                            <tr><td colspan="3" class="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-[10px]">Syncing On-Chain Data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p id="syncMsg" class="syncing text-center mt-6 hidden text-blue-900 uppercase tracking-widest">Blockchain connection lag. Switching to public nodes...</p>
             </div>
         </div>
     </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script>
-    const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
-    const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-    const ADDR_FOUNDER = "0x31838e2FA16f364b54B8F3B186f3AeeD68df816f".toLowerCase();
+    <footer class="py-20 text-center text-[10px] text-gray-800 uppercase tracking-widest">© 2026 COMRADE6 WORLD COMMUNITY</footer>
 
-    // JALUR KHUSUS (Agar tidak lag)
-    const RPC_NODES = [
-        "https://polygon-rpc.com",
-        "https://rpc-mainnet.maticvigil.com",
-        "https://matic-mainnet.chainstacklabs.com"
-    ];
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script>
+        const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
+        const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+        const ADDR_FOUNDER = "0x31838e2FA16f364b54B8F3B186f3AeeD68df816f".toLowerCase();
 
-    let user, provider, signer, cUSDT, cSquad;
+        // PUBLIC RPC NODES (Fallback if MetaMask lags)
+        const RPC_NODES = [
+            "https://polygon.llamarpc.com",
+            "https://rpc.ankr.com/polygon",
+            "https://1rpc.io/matic"
+        ];
 
-    document.getElementById('btnConnect').addEventListener('click', connect);
-    document.getElementById('btnJoin').addEventListener('click', join);
-    document.getElementById('btnCopy').addEventListener('click', copyRef);
+        let user, provider, signer, cUSDT, cSquad;
 
-    async function connect() {
-        if (!window.ethereum) return alert("MetaMask!");
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        user = (await signer.getAddress()).toLowerCase();
-        document.getElementById('btnConnect').innerText = user.substring(0,6)+"...";
-        
-        // Setup Contract dengan Signer (Untuk Transaksi)
-        cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
-        cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)", "function users(address) view returns (address, uint256, uint256, uint256)"], signer);
+        document.getElementById('btnConnect').addEventListener('click', connect);
+        document.getElementById('btnJoin').addEventListener('click', join);
+        document.getElementById('btnCopy').addEventListener('click', copyRef);
 
-        document.getElementById('doorJoin').classList.add('hidden');
-        document.getElementById('doorEmpire').classList.remove('hidden');
+        async function connect() {
+            if (!window.ethereum) return alert("Install MetaMask!");
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                user = (await signer.getAddress()).toLowerCase();
+                
+                document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
+                
+                cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
+                cSquad = new ethers.Contract(ADDR_CONTRACT, [
+                    "function join(address, uint256) external", 
+                    "function totalUsers() view returns (uint256)", 
+                    "function users(address) view returns (address, uint256, uint256, uint256)"
+                ], signer);
 
-        sync();
-        setInterval(sync, 8000); // Cek setiap 8 detik
-    }
+                document.getElementById('doorJoin').classList.add('hidden');
+                document.getElementById('doorEmpire').classList.remove('hidden');
 
-    async function sync() {
-        try {
-            // 1. Ambil Balance (Direct from Wallet)
-            const balRaw = await cUSDT.balanceOf(user);
-            document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
-
-            // 2. Ambil Global & Matrix Data (Pakai Fast Provider jika Wallet Lag)
-            const gUsers = await cSquad.totalUsers();
-            document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
-            document.getElementById('globalCount').classList.remove('hidden');
-
-            const data = await cSquad.users(user);
-            const team = data[3].toString();
-            const earns = ethers.utils.formatUnits(data[2], 6);
-            
-            render(team, earns);
-            document.getElementById('syncMsg').classList.add('hidden');
-        } catch (e) { 
-            console.log("Jalur RPC utama sibuk, mencoba jalur cadangan...");
-            document.getElementById('syncMsg').classList.remove('hidden');
-            // Coba panggil data manual lewat provider luar jika MetaMask lag
-            tryFallback();
+                sync();
+                setInterval(sync, 10000); 
+            } catch (err) { console.error("Connection Failed", err); }
         }
-    }
 
-    async function tryFallback() {
-        try {
-            const fallbackProvider = new ethers.providers.JsonRpcProvider(RPC_NODES[0]);
-            const fallbackContract = new ethers.Contract(ADDR_CONTRACT, ["function users(address) view returns (address, uint256, uint256, uint256)"], fallbackProvider);
-            const data = await fallbackContract.users(user);
-            render(data[3].toString(), ethers.utils.formatUnits(data[2], 6));
-            document.getElementById('syncMsg').classList.add('hidden');
-        } catch(err) { console.log("Semua jalur sibuk."); }
-    }
+        async function sync() {
+            try {
+                // 1. Balance Check (MetaMask Provider)
+                const balRaw = await cUSDT.balanceOf(user);
+                document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-    function render(team, earns) {
-        const body = document.getElementById('matrixRows');
-        body.innerHTML = "";
-        const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
-        caps.forEach((cap, i) => {
-            const lvl = i + 1;
-            const rowTeam = (lvl === 1) ? team : "0";
-            const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
-            body.innerHTML += `<tr><td class="p-4 font-bold text-gray-500 uppercase text-[11px]">Level ${lvl}</td><td class="p-4 text-blue-400 font-bold">${rowTeam} / ${cap.toLocaleString()}</td><td class="p-4 text-green-500 font-bold font-mono">$${rowEarn}</td></tr>`;
-        });
-    }
+                // 2. Data Fetch (MetaMask Provider)
+                const gUsers = await cSquad.totalUsers();
+                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
+                document.getElementById('globalCount').classList.remove('hidden');
 
-    // Fungsi Join & Copy tetap sama...
-    async function join() {
-        if(!document.getElementById('checkRisk').checked) return alert("Legal check!");
-        const urlParams = new URLSearchParams(window.location.search);
-        const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
-        try {
+                const data = await cSquad.users(user);
+                render(data[3].toString(), ethers.utils.formatUnits(data[2], 6));
+                document.getElementById('syncMsg').classList.add('hidden');
+            } catch (e) { 
+                console.log("MetaMask RPC lag, trying public nodes...");
+                document.getElementById('syncMsg').classList.remove('hidden');
+                tryFallback();
+            }
+        }
+
+        async function tryFallback() {
+            for (let rpc of RPC_NODES) {
+                try {
+                    const fbProvider = new ethers.providers.JsonRpcProvider(rpc);
+                    const fbContract = new ethers.Contract(ADDR_CONTRACT, [
+                        "function totalUsers() view returns (uint256)",
+                        "function users(address) view returns (address, uint256, uint256, uint256)"
+                    ], fbProvider);
+                    
+                    const gUsers = await fbContract.totalUsers();
+                    document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
+                    
+                    const data = await fbContract.users(user);
+                    render(data[3].toString(), ethers.utils.formatUnits(data[2], 6));
+                    
+                    document.getElementById('syncMsg').classList.add('hidden');
+                    console.log("Success using: " + rpc);
+                    break; 
+                } catch(err) {
+                    console.log("Node " + rpc + " busy...");
+                }
+            }
+        }
+
+        function render(team, earns) {
+            const body = document.getElementById('matrixRows');
+            body.innerHTML = "";
+            const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
+            caps.forEach((cap, i) => {
+                const lvl = i + 1;
+                const rowTeam = (lvl === 1) ? team : "0";
+                const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
+                body.innerHTML += `<tr>
+                    <td class="p-4 font-bold text-gray-500 uppercase text-[11px]">Level ${lvl}</td>
+                    <td class="p-4 text-blue-400 font-bold">${rowTeam} / ${cap.toLocaleString()}</td>
+                    <td class="p-4 text-green-500 font-bold font-mono">$${rowEarn}</td>
+                </tr>`;
+            });
+        }
+
+        async function join() {
+            if(!document.getElementById('checkRisk').checked) return alert("Please agree to the legal disclaimer!");
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
             const amount = ethers.utils.parseUnits("6", 6);
-            const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
-            await tx1.wait();
-            const tx2 = await cSquad.join(ref, amount);
-            await tx2.wait();
-            location.reload();
-        } catch (err) { alert("Failed"); }
-    }
+            
+            try {
+                const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
+                await tx1.wait();
+                const tx2 = await cSquad.join(ref, amount);
+                await tx2.wait();
+                location.reload();
+            } catch (err) { alert("Transaction failed. Check USDT/POL balance."); }
+        }
 
-    function copyRef() {
-        navigator.clipboard.writeText("https://comrade6.com/?ref=" + user);
-        alert("Copied!");
-    }
-</script>
+        function copyRef() {
+            const link = "https://comrade6.com/?ref=" + user;
+            navigator.clipboard.writeText(link);
+            alert("Referral Link Copied!");
+        }
+    </script>
 </body>
 </html>
