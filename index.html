@@ -63,95 +63,110 @@
         </div>
     </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script>
-        const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
-        const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-        const ADDR_FOUNDER = "0x31838e2FA16f364b54B8F3B186f3AeeD68df816f".toLowerCase();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+    const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
+    const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+    const ADDR_FOUNDER = "0x31838e2FA16f364b54B8F3B186f3AeeD68df816f".toLowerCase();
 
-        let user, provider, signer, cUSDT, cSquad;
+    // JALUR KHUSUS (Agar tidak lag)
+    const RPC_NODES = [
+        "https://polygon-rpc.com",
+        "https://rpc-mainnet.maticvigil.com",
+        "https://matic-mainnet.chainstacklabs.com"
+    ];
 
-        document.getElementById('btnConnect').addEventListener('click', connect);
-        document.getElementById('btnJoin').addEventListener('click', join);
-        document.getElementById('btnCopy').addEventListener('click', copyRef);
+    let user, provider, signer, cUSDT, cSquad;
 
-        async function connect() {
-            if (!window.ethereum) return alert("MetaMask!");
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            signer = provider.getSigner();
-            user = (await signer.getAddress()).toLowerCase();
-            document.getElementById('btnConnect').innerText = user.substring(0,6)+"...";
+    document.getElementById('btnConnect').addEventListener('click', connect);
+    document.getElementById('btnJoin').addEventListener('click', join);
+    document.getElementById('btnCopy').addEventListener('click', copyRef);
+
+    async function connect() {
+        if (!window.ethereum) return alert("MetaMask!");
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        user = (await signer.getAddress()).toLowerCase();
+        document.getElementById('btnConnect').innerText = user.substring(0,6)+"...";
+        
+        // Setup Contract dengan Signer (Untuk Transaksi)
+        cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
+        cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external", "function totalUsers() view returns (uint256)", "function users(address) view returns (address, uint256, uint256, uint256)"], signer);
+
+        document.getElementById('doorJoin').classList.add('hidden');
+        document.getElementById('doorEmpire').classList.remove('hidden');
+
+        sync();
+        setInterval(sync, 8000); // Cek setiap 8 detik
+    }
+
+    async function sync() {
+        try {
+            // 1. Ambil Balance (Direct from Wallet)
+            const balRaw = await cUSDT.balanceOf(user);
+            document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
+
+            // 2. Ambil Global & Matrix Data (Pakai Fast Provider jika Wallet Lag)
+            const gUsers = await cSquad.totalUsers();
+            document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
+            document.getElementById('globalCount').classList.remove('hidden');
+
+            const data = await cSquad.users(user);
+            const team = data[3].toString();
+            const earns = ethers.utils.formatUnits(data[2], 6);
             
-            cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
-            cSquad = new ethers.Contract(ADDR_CONTRACT, [
-                "function join(address, uint256) external", 
-                "function totalUsers() view returns (uint256)", 
-                "function users(address) view returns (address, uint256, uint256, uint256)"
-            ], signer);
-
-            // Tampilkan Dashboard Dulu (Pintu Terbuka)
-            document.getElementById('doorJoin').classList.add('hidden');
-            document.getElementById('doorEmpire').classList.remove('hidden');
-
-            sync();
-            setInterval(sync, 5000); // Ketok pintu blockchain setiap 5 detik
+            render(team, earns);
+            document.getElementById('syncMsg').classList.add('hidden');
+        } catch (e) { 
+            console.log("Jalur RPC utama sibuk, mencoba jalur cadangan...");
+            document.getElementById('syncMsg').classList.remove('hidden');
+            // Coba panggil data manual lewat provider luar jika MetaMask lag
+            tryFallback();
         }
+    }
 
-        async function sync() {
-            try {
-                // 1. Balance (Cepat)
-                const balRaw = await cUSDT.balanceOf(user);
-                document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
+    async function tryFallback() {
+        try {
+            const fallbackProvider = new ethers.providers.JsonRpcProvider(RPC_NODES[0]);
+            const fallbackContract = new ethers.Contract(ADDR_CONTRACT, ["function users(address) view returns (address, uint256, uint256, uint256)"], fallbackProvider);
+            const data = await fallbackContract.users(user);
+            render(data[3].toString(), ethers.utils.formatUnits(data[2], 6));
+            document.getElementById('syncMsg').classList.add('hidden');
+        } catch(err) { console.log("Semua jalur sibuk."); }
+    }
 
-                // 2. Global Users
-                const gUsers = await cSquad.totalUsers();
-                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
-                document.getElementById('globalCount').classList.remove('hidden');
+    function render(team, earns) {
+        const body = document.getElementById('matrixRows');
+        body.innerHTML = "";
+        const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
+        caps.forEach((cap, i) => {
+            const lvl = i + 1;
+            const rowTeam = (lvl === 1) ? team : "0";
+            const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
+            body.innerHTML += `<tr><td class="p-4 font-bold text-gray-500 uppercase text-[11px]">Level ${lvl}</td><td class="p-4 text-blue-400 font-bold">${rowTeam} / ${cap.toLocaleString()}</td><td class="p-4 text-green-500 font-bold font-mono">$${rowEarn}</td></tr>`;
+        });
+    }
 
-                // 3. Matrix Data (Murni On-Chain)
-                const data = await cSquad.users(user);
-                const team = data[3].toString();
-                const earns = ethers.utils.formatUnits(data[2], 6);
-                
-                render(team, earns);
-                document.getElementById('syncMsg').classList.add('hidden');
-            } catch (e) { 
-                console.log("Sync lag...");
-                document.getElementById('syncMsg').classList.remove('hidden');
-            }
-        }
+    // Fungsi Join & Copy tetap sama...
+    async function join() {
+        if(!document.getElementById('checkRisk').checked) return alert("Legal check!");
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
+        try {
+            const amount = ethers.utils.parseUnits("6", 6);
+            const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
+            await tx1.wait();
+            const tx2 = await cSquad.join(ref, amount);
+            await tx2.wait();
+            location.reload();
+        } catch (err) { alert("Failed"); }
+    }
 
-        function render(team, earns) {
-            const body = document.getElementById('matrixRows');
-            body.innerHTML = "";
-            const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
-            caps.forEach((cap, i) => {
-                const lvl = i + 1;
-                const rowTeam = (lvl === 1) ? team : "0";
-                const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
-                body.innerHTML += `<tr><td class="p-4 font-bold text-gray-500 uppercase text-[11px]">Level ${lvl}</td><td class="p-4 text-blue-400 font-bold">${rowTeam} / ${cap.toLocaleString()}</td><td class="p-4 text-green-500 font-bold font-mono">$${rowEarn}</td></tr>`;
-            });
-        }
-
-        async function join() {
-            if(!document.getElementById('checkRisk').checked) return alert("Disclaimer!");
-            const urlParams = new URLSearchParams(window.location.search);
-            const ref = urlParams.get('ref') || "0x0000000000000000000000000000000000000000";
-            try {
-                const amount = ethers.utils.parseUnits("6", 6);
-                const tx1 = await cUSDT.approve(ADDR_CONTRACT, amount);
-                await tx1.wait();
-                const tx2 = await cSquad.join(ref, amount);
-                await tx2.wait();
-                location.reload();
-            } catch (err) { alert("Failed"); }
-        }
-
-        function copyRef() {
-            navigator.clipboard.writeText("https://comrade6.com/?ref=" + user);
-            alert("Copied!");
-        }
-    </script>
+    function copyRef() {
+        navigator.clipboard.writeText("https://comrade6.com/?ref=" + user);
+        alert("Copied!");
+    }
+</script>
 </body>
 </html>
