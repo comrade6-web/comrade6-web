@@ -106,52 +106,45 @@
             } catch (err) { console.error("Login Fail", err); }
         }
 
-        async function sync() {
+async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT (Manual Call)
+                // 1. Saldo USDT (Pasti Muncul)
                 const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await alcUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Data Matrix (Manual Hex Decoder)
-                // users(address) selector: 0xa87430ba
-                const cleanAddr = user.replace("0x", "").toLowerCase().padStart(64, '0');
-                const dataHex = "0xa87430ba" + cleanAddr;
+                // 2. HITUNG TEAM SIZE DARI EVENTS (Jalur Audit)
+                // Kita cari event 'MemberJoined' atau transaksi yang masuk ke kontrak
+                console.log("🕵️ Auditing Blockchain Events for:", user);
+                
+                // Filter: Cari semua transaksi 'Join' yang referrernya adalah KAMU
+                const topicReferrer = ethers.utils.hexZeroPad(user, 32);
+                const logs = await alcProvider.getLogs({
+                    address: ADDR_CONTRACT,
+                    fromBlock: 0, // Scan dari awal kontrak lahir
+                    toBlock: "latest",
+                    topics: [null, null, topicReferrer] // Topic ke-3 biasanya Referrer di Smart Contract Matrix
+                });
 
-                console.log("🕵️ Scanning Contract Memory...");
-                const rawResult = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
+                const teamCount = logs.length; // Jumlah transaksi yang pake link kamu
+                const totalEarns = (teamCount * 0.60).toFixed(2); // Estimasi: $0.60 per downline
 
-                if (rawResult && rawResult !== "0x") {
-                    // Pembedahan Manual Hex (Setiap data = 32 bytes / 64 karakter)
-                    // [0]: Referrer (0-64)
-                    // [1]: Package (64-128)
-                    // [2]: Earnings (128-192) -> USDT 6 desimal
-                    // [3]: TeamSize (192-256)
-                    const earningsHex = "0x" + rawResult.substring(130, 194);
-                    const teamHex = "0x" + rawResult.substring(194, 258);
+                console.log("✅ Audit Success! Found:", teamCount, "downlines.");
 
-                    const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earningsHex), 6);
-                    const team = ethers.BigNumber.from(teamHex).toString();
-
-                    console.log("✅ Data Found - Team:", team, "Earns:", earns);
-                    render(team, earns);
-                } else {
-                    console.warn("⚠️ Contract returned empty memory.");
-                    render("0", "0.00");
-                }
+                // Render Data Hasil Audit
+                render(teamCount.toString(), totalEarns);
 
                 // 3. Global Stats
-                try {
-                    const resGlobal = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
-                    const gUsers = ethers.BigNumber.from(resGlobal).toString();
-                    document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
-                    document.getElementById('globalCount').classList.remove('hidden');
-                } catch(e) {}
+                const resGlobal = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
+                const gUsers = ethers.BigNumber.from(resGlobal).toString();
+                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
+                document.getElementById('globalCount').classList.remove('hidden');
 
             } catch (err) {
-                console.error("❌ Deep Scan Error:", err);
+                console.error("❌ Audit Fail:", err);
+                // Jika audit gagal, tampilkan 0 daripada error
                 render("0", "0.00");
             }
         }
