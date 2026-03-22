@@ -7,7 +7,8 @@
     
     <meta property="og:title" content="Comrade6 | Transparent Growth">
     <meta property="og:description" content="100% Decentralized Matrix Protocol. No Admin. No Gimmicks. On-Chain Verified.">
-    <meta property="og:image" content="https://comrade6.com/preview.png"> <meta property="og:url" content="https://comrade6.com">
+    <meta property="og:image" content="https://comrade6.com/preview.png"> 
+    <meta property="og:url" content="https://comrade6.com">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -92,34 +93,34 @@
             </div>
         </div>
 
+        <div id="doorJoin" class="hidden mt-10">
+            <div class="glass p-12 rounded-[3.5rem] text-center border-t-4 border-blue-600">
+                <h2 class="text-3xl font-black uppercase italic mb-6">Choose Your Entrance</h2>
+                <div class="flex flex-col md:flex-row gap-6 justify-center">
+                    <button class="bg-blue-600 px-10 py-6 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 shadow-xl">
+                        Lite Squad ($6)
+                    </button>
+                    <button class="bg-gray-800 border border-white/10 px-10 py-6 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-900 shadow-xl">
+                        Alpha Squad ($60)
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-6 uppercase tracking-widest tracking-widest">Connect your wallet & join the transparent growth</p>
+            </div>
+        </div>
+
         <div class="max-w-3xl mx-auto mt-24 text-left">
             <h3 class="text-xl font-black italic uppercase mb-8 border-b border-white/10 pb-4 tracking-[0.2em]">Protocol FAQ</h3>
             <div class="space-y-4">
                 <details class="glass p-6 rounded-2xl group">
                     <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">What is Comrade6? <span class="text-blue-500 group-open:rotate-180 transition">+</span></summary>
-                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">Comrade6 is a 100% decentralized on-chain matrix protocol on the Polygon Network. It operates autonomously without any central admin. Every transaction is a direct peer-to-peer distribution executed instantly by the smart contract.</p>
+                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">Comrade6 is a 100% decentralized on-chain matrix protocol on the Polygon Network. It operates autonomously without any central admin.</p>
                 </details>
                 <details class="glass p-6 rounded-2xl group">
                     <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">Distribution Rule: How It Works <span class="text-blue-500 group-open:rotate-180 transition">+</span></summary>
-                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">The protocol follow a strictly coded algorithm to distribute contributions. When a member joins, the smart contract instantly calculates and triggers distributions to the qualified upline wallets in real-time.</p>
+                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">The protocol follow a strictly coded algorithm to distribute contributions in real-time.</p>
                 </details>
             </div>
         </div>
-        
-        <div id="doorJoin" class="hidden mt-10">
-    <div class="glass p-12 rounded-[3.5rem] text-center border-t-4 border-blue-600">
-        <h2 class="text-3xl font-black uppercase italic mb-6">Choose Your Entrance</h2>
-        <div class="flex flex-col md:flex-row gap-6 justify-center">
-            <button class="bg-blue-600 px-10 py-6 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 shadow-xl">
-                Lite Squad ($6)
-            </button>
-            <button class="bg-gray-800 border border-white/10 px-10 py-6 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-900 shadow-xl">
-                Alpha Squad ($60)
-            </button>
-        </div>
-        <p class="text-[10px] text-gray-500 mt-6 uppercase tracking-widest">Connect your wallet & join the transparent growth</p>
-    </div>
-</div>
     </section>
 
     <script>
@@ -129,12 +130,11 @@
         
         let user, signer;
 
-        // --- 2. PERSISTENT REFERRAL LOGIC ---
+        // REFERRAL LOGIC
         const urlParams = new URLSearchParams(window.location.search);
         const refLink = urlParams.get('ref');
         if (refLink) {
             localStorage.setItem('c6_upline', refLink.toLowerCase());
-            console.log("💾 Referral Locked In:", refLink);
         }
 
         document.getElementById('btnConnect').addEventListener('click', connect);
@@ -188,36 +188,28 @@
             document.getElementById('matrixBody').innerHTML = html;
         }
 
-async function sync() {
+        async function sync() {
             console.log("🕵️ Auditor Mode: Syncing Status...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-            
-            // 1. HARD-CODED FOUNDER ADDRESS (YOUR MASTER KEY)
             const founderAddr = "0x31838e2fa16f364b54b8f3b186f3aeed68df816f".toLowerCase();
             const isFounder = (user.toLowerCase() === founderAddr);
             
             let hasJoined = false;
 
             try {
-                // 2. CEK STATUS JOIN VIA CONTRACT CALL
                 const contract = new ethers.Contract(ADDR_CONTRACT, ["function users(address) view returns (address, uint256, uint256, bool)"], alcProvider);
                 const userData = await contract.users(user);
-                // Kita cek index ke-3 (boolean status)
+                // PERBAIKAN: Baca status bool secara eksplisit
                 hasJoined = userData[3] === true; 
-                console.log("📊 User Data From Contract:", userData);
-            } catch (err) {
-                console.warn("⚠️ Contract sync failed, checking if Founder...");
-            }
+                console.log("📊 User Data Found:", userData);
+            } catch (err) { console.warn("⚠️ Sync error"); }
 
-            // --- THE GATEKEEPER DECISION ---
+            // GATEKEEPER DECISION
             if (isFounder || hasJoined) {
-                console.log("🔓 Access Granted to Empire!");
-                
-                // TAMPILKAN MAHA KARYA
+                // TAMPILKAN TABEL EMPIRE
                 document.getElementById('doorEmpire').classList.remove('hidden');
-                if(document.getElementById('doorJoin')) document.getElementById('doorJoin').classList.add('hidden');
+                document.getElementById('doorJoin').classList.add('hidden');
 
-                // SYNC BALANCE & GLOBAL DATA
                 const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
@@ -234,25 +226,18 @@ async function sync() {
 
                 document.getElementById('txtSquad').innerText = squadSize;
                 document.getElementById('txtEarns').innerText = "$" + squadEarns;
-                
                 renderTable(squadSize, squadEarns);
+                console.log("🔓 Empire Unlocked");
             } else {
-                console.log("🛑 Access Denied. Showing Registration Gate.");
-                
-                // USER 003: SEMBUNYIKAN EMPIRE, TAMPILKAN PINTU JOIN
+                // HANYA UNTUK YANG BELUM JOIN (003)
                 document.getElementById('doorEmpire').classList.add('hidden');
-                if(document.getElementById('doorJoin')) {
-                    document.getElementById('doorJoin').classList.remove('hidden');
-                } else {
-                    // Jika kamu belum buat div 'doorJoin', minimal kita beri tanda
-                    console.error("❌ Element 'doorJoin' not found in HTML!");
-                }
-
-                // Global count tetap muncul agar meyakinkan
+                document.getElementById('doorJoin').classList.remove('hidden');
+                
                 const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
                 const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
                 document.getElementById('globalCount').innerText = "Global Squad: " + Math.floor(rawGlobal / 9);
                 document.getElementById('globalCount').classList.remove('hidden');
+                console.log("🛑 Showing Registration Gate");
             }
         }
     </script>
