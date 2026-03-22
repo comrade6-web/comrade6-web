@@ -199,20 +199,26 @@ async function sync() {
             let hasJoined = false;
 
             try {
-                // 2. RAW CALL TO CONTRACT (ANTI-ERROR)
-                // Kita panggil manual storage/mapping 'users'
-                // Method ID untuk users(address) adalah 0xa87430ba
+                // 2. RAW CALL DATA CHECK
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 const response = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                 
-                // Jika response bukan sekadar angka nol di ujungnya, berarti user terdaftar
-                // Di mapping users, bool joined ada di slot terakhir (offset data tertentu)
-                // Kita cek apakah ada address upline yang tersimpan (bukan 0x0...0)
-                hasJoined = (response !== "0x" && !response.includes("0000000000000000000000000000000000000000000000000000000000000000"));
-                
                 console.log("📊 Contract Response Hex:", response);
+
+                // LOGIKA BARU: Jika response mengandung alamat Founder (upline) 
+                // atau bukan deretan angka nol panjang, berarti dia MEMBER.
+                if (response !== "0x" && response.length > 64) {
+                    // Kita cek apakah ada "tanda kehidupan" di data tersebut
+                    // Member pasti punya upline, jadi data tidak mungkin nol semua
+                    const cleanData = response.replace("0x", "");
+                    const isAllZeros = /^0+$/.test(cleanData);
+                    
+                    if (!isAllZeros) {
+                        hasJoined = true;
+                    }
+                }
             } catch (err) {
-                console.error("⚠️ Sync Error Detail:", err);
+                console.error("⚠️ Sync Error:", err);
             }
 
             // --- THE GATEKEEPER DECISION ---
@@ -222,6 +228,7 @@ async function sync() {
                 document.getElementById('doorEmpire').classList.remove('hidden');
                 if(document.getElementById('doorJoin')) document.getElementById('doorJoin').classList.add('hidden');
 
+                // UPDATE DATA DASHBOARD
                 const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
@@ -233,7 +240,9 @@ async function sync() {
                 document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                const squadSize = isFounder ? globalMemberCount : 0;
+                // Jika dia Member biasa (002), squadSize & earns diset dari data aslinya (nanti kita buat dinamis)
+                // Untuk sekarang Founder tetap full global data
+                const squadSize = isFounder ? globalMemberCount : 0; 
                 const squadEarns = (squadSize * 6.00).toFixed(2);
 
                 document.getElementById('txtSquad').innerText = squadSize;
