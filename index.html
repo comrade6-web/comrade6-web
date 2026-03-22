@@ -108,43 +108,43 @@
 
 async function sync() {
             try {
+                // Kita pake Provider Standar yang paling stabil
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT (Pasti Muncul)
+                // 1. Saldo USDT (Ini wajib muncul!)
                 const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await alcUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. HITUNG TEAM SIZE DARI EVENTS (Jalur Audit)
-                // Kita cari event 'MemberJoined' atau transaksi yang masuk ke kontrak
-                console.log("🕵️ Auditing Blockchain Events for:", user);
-                
-                // Filter: Cari semua transaksi 'Join' yang referrernya adalah KAMU
-                const topicReferrer = ethers.utils.hexZeroPad(user, 32);
-                const logs = await alcProvider.getLogs({
-                    address: ADDR_CONTRACT,
-                    fromBlock: 0, // Scan dari awal kontrak lahir
-                    toBlock: "latest",
-                    topics: [null, null, topicReferrer] // Topic ke-3 biasanya Referrer di Smart Contract Matrix
-                });
-
-                const teamCount = logs.length; // Jumlah transaksi yang pake link kamu
-                const totalEarns = (teamCount * 0.60).toFixed(2); // Estimasi: $0.60 per downline
-
-                console.log("✅ Audit Success! Found:", teamCount, "downlines.");
-
-                // Render Data Hasil Audit
-                render(teamCount.toString(), totalEarns);
-
-                // 3. Global Stats
+                // 2. CEK GLOBAL COUNT (Pintu Masuk)
                 const resGlobal = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
                 const gUsers = ethers.BigNumber.from(resGlobal).toString();
                 document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
                 document.getElementById('globalCount').classList.remove('hidden');
 
+                // 3. AMBIL DATA LEVEL 1 (Logic PPIC: Cek Langsung ke Memory Slot)
+                // Kita panggil manual hex tapi hanya minta bagian Team Size
+                const cleanAddr = user.replace("0x", "").toLowerCase().padStart(64, '0');
+                const dataHex = "0xa87430ba" + cleanAddr;
+
+                const rawResult = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
+
+                if (rawResult && rawResult.length > 130) {
+                    // Kita potong manual: Team Size biasanya ada di akhir (offset 192-256)
+                    const teamHex = "0x" + rawResult.substring(rawResult.length - 64);
+                    const earningsHex = "0x" + rawResult.substring(rawResult.length - 128, rawResult.length - 64);
+
+                    const team = ethers.BigNumber.from(teamHex).toString();
+                    const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earningsHex), 6);
+
+                    console.log("Found Network Data:", team, earns);
+                    render(team, earns);
+                } else {
+                    render("0", "0.00");
+                }
+
             } catch (err) {
-                console.error("❌ Audit Fail:", err);
-                // Jika audit gagal, tampilkan 0 daripada error
+                console.warn("Retrying with simple render...");
                 render("0", "0.00");
             }
         }
