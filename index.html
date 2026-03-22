@@ -108,43 +108,44 @@
 
 async function sync() {
             try {
-                // Kita pake Provider Standar yang paling stabil
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT (Ini wajib muncul!)
+                // 1. Saldo USDT (Ini Tetap Lewat Alchemy karena Pasti Tembus)
                 const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await alcUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. CEK GLOBAL COUNT (Pintu Masuk)
-                const resGlobal = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
-                const gUsers = ethers.BigNumber.from(resGlobal).toString();
-                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
-                document.getElementById('globalCount').classList.remove('hidden');
+                // 2. DATA MATRIX (JALUR BYPASS POLYGONSCAN)
+                // Kita tanya langsung ke "Database" PolygonScan lewat API Publik
+                console.log("🕵️ Bypassing Node... Fetching from PolygonScan Indexer...");
+                
+                const response = await fetch(`https://api.polygonscan.com/api?module=proxy&action=eth_call&to=${ADDR_CONTRACT}&data=0xa87430ba000000000000000000000000${user.replace('0x', '')}&tag=latest&apikey=YourApiKeyToken`);
+                const result = await response.json();
 
-                // 3. AMBIL DATA LEVEL 1 (Logic PPIC: Cek Langsung ke Memory Slot)
-                // Kita panggil manual hex tapi hanya minta bagian Team Size
-                const cleanAddr = user.replace("0x", "").toLowerCase().padStart(64, '0');
-                const dataHex = "0xa87430ba" + cleanAddr;
-
-                const rawResult = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
-
-                if (rawResult && rawResult.length > 130) {
-                    // Kita potong manual: Team Size biasanya ada di akhir (offset 192-256)
-                    const teamHex = "0x" + rawResult.substring(rawResult.length - 64);
-                    const earningsHex = "0x" + rawResult.substring(rawResult.length - 128, rawResult.length - 64);
-
+                if (result.result && result.result !== "0x") {
+                    const raw = result.result;
+                    // Decoding Manual:
+                    const earnsHex = "0x" + raw.substring(130, 194);
+                    const teamHex = "0x" + raw.substring(194, 258);
+                    
+                    const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earnsHex), 6);
                     const team = ethers.BigNumber.from(teamHex).toString();
-                    const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earningsHex), 6);
 
-                    console.log("Found Network Data:", team, earns);
+                    console.log("✅ DATA BYPASS SUCCESS:", team, earns);
                     render(team, earns);
                 } else {
                     render("0", "0.00");
                 }
 
+                // 3. GLOBAL COUNT (Manual Call)
+                const resG = await fetch(`https://api.polygonscan.com/api?module=proxy&action=eth_call&to=${ADDR_CONTRACT}&data=0x16584090&tag=latest`);
+                const dataG = await resG.json();
+                const gUsers = ethers.BigNumber.from(dataG.result).toString();
+                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
+                document.getElementById('globalCount').classList.remove('hidden');
+
             } catch (err) {
-                console.warn("Retrying with simple render...");
+                console.warn("Bypass failed, showing default.");
                 render("0", "0.00");
             }
         }
