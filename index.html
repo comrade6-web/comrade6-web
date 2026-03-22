@@ -161,56 +161,46 @@
 // --- MAHA KARYA: JOIN LITE FUNCTION (FIXED ABI) ---
 async function joinLite() {
             try {
-                console.log("🚀 Starting Activation Process (Target: Package $6)...");
+                console.log("🚀 Starting Activation Process ($6 Micro-Unit)...");
                 const btn = document.getElementById('btnJoinLite');
                 btn.innerText = "PROCESSING..."; 
                 btn.disabled = true;
 
-                // 1. Ambil Upline dari LocalStorage (Default ke Founder 001 jika kosong)
-                let upline = (localStorage.getItem('c6_upline') || "0x31838e2fa16f364b54b8f3b186f3aeed68df816f").toLowerCase();
+                const upline = (localStorage.getItem('c6_upline') || "0x31838e2fa16f364b54b8f3b186f3aeed68df816f").toLowerCase();
                 
-                // 2. Definisi Kontrak (ABI Presisi)
                 const cUSDT = new ethers.Contract(ADDR_USDT, [
                     "function approve(address spender, uint256 amount) returns (bool)", 
                     "function allowance(address owner, address spender) view returns (uint256)"
                 ], signer);
                 
+                // KITA SESUAIKAN ABI DENGAN KONTRAK ASLI: join(address, uint256)
                 const cCom = new ethers.Contract(ADDR_CONTRACT, [
-                    "function join(address _upline, uint256 _packageId)"
+                    "function join(address _referrer, uint256 _package)"
                 ], signer);
 
-                const amount = ethers.utils.parseUnits("6.0", 6);
+                // Kontrak minta 6 USDT dengan desimal (6,000,000)
+                const packageValue = ethers.utils.parseUnits("6.0", 6); 
 
-                // 3. STEP 1: Cek & Approve USDT (Izin Tarik Dana)
+                // 1. APPROVAL CHECK
                 const allowance = await cUSDT.allowance(user, ADDR_CONTRACT);
-                if (allowance.lt(amount)) {
-                    console.log("✍️ Requesting USDT Approval...");
-                    const txApp = await cUSDT.approve(ADDR_CONTRACT, ethers.utils.parseUnits("1000000", 6)); 
+                if (allowance.lt(packageValue)) {
+                    const txApp = await cUSDT.approve(ADDR_CONTRACT, ethers.constants.MaxUint256);
                     await txApp.wait();
-                    console.log("✅ USDT Approved!");
                 }
 
-                // 4. STEP 2: Eksekusi JOIN (Kirim Angka 6 sesuai Perintah Kontrak)
-                console.log("⚔️ Sending Join Transaction to Contract with Package ID: 6");
+                // 2. EKSEKUSI JOIN (Kirim packageValue, bukan angka 6!)
+                console.log("⚔️ Sending Join Transaction with 6,000,000 Micro-USDT...");
                 
-                // Kita gunakan ID 6 (Bukan 1) agar diterima oleh require kontrak kamu
-                const txJoin = await cCom.join(upline, 6); 
+                // Di sini kuncinya: kita kirim 'packageValue' (6000000)
+                const txJoin = await cCom.join(upline, packageValue); 
                 
-                console.log("⏳ Waiting for Confirmation on Polygon...");
                 await txJoin.wait();
-                
                 alert("🔥 SUCCESS! Welcome to the Empire, Comrade!");
                 location.reload();
 
             } catch (err) {
-                console.error("❌ ERROR DETAIL:", err);
-                
-                let msg = "Transaction Failed!";
-                if (err.code === 4001) msg = "User denied transaction.";
-                if (err.message.includes("insufficient funds")) msg = "Not enough POL (Matic) for gas fees!";
-                if (err.message.includes("execution reverted")) msg = "Contract Rejected: Please check Package ID or Upline status!";
-                
-                alert(msg);
+                console.error("❌ ERROR:", err);
+                alert("Transaction Failed! Check Console (F12).");
                 const btn = document.getElementById('btnJoinLite');
                 btn.innerText = "Activate $6 USDT";
                 btn.disabled = false;
