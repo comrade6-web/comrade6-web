@@ -188,27 +188,39 @@
             document.getElementById('matrixBody').innerHTML = html;
         }
 
-        async function sync() {
+async function sync() {
             console.log("🕵️ Auditor Mode: Syncing Status...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
+            
+            // 1. MASTER KEY: FOUNDER ALWAYS IN
             const founderAddr = "0x31838e2fa16f364b54b8f3b186f3aeed68df816f".toLowerCase();
             const isFounder = (user.toLowerCase() === founderAddr);
             
             let hasJoined = false;
 
             try {
-                const contract = new ethers.Contract(ADDR_CONTRACT, ["function users(address) view returns (address, uint256, uint256, bool)"], alcProvider);
-                const userData = await contract.users(user);
-                // PERBAIKAN: Baca status bool secara eksplisit
-                hasJoined = userData[3] === true; 
-                console.log("📊 User Data Found:", userData);
-            } catch (err) { console.warn("⚠️ Sync error"); }
+                // 2. RAW CALL TO CONTRACT (ANTI-ERROR)
+                // Kita panggil manual storage/mapping 'users'
+                // Method ID untuk users(address) adalah 0xa87430ba
+                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
+                const response = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
+                
+                // Jika response bukan sekadar angka nol di ujungnya, berarti user terdaftar
+                // Di mapping users, bool joined ada di slot terakhir (offset data tertentu)
+                // Kita cek apakah ada address upline yang tersimpan (bukan 0x0...0)
+                hasJoined = (response !== "0x" && !response.includes("0000000000000000000000000000000000000000000000000000000000000000"));
+                
+                console.log("📊 Contract Response Hex:", response);
+            } catch (err) {
+                console.error("⚠️ Sync Error Detail:", err);
+            }
 
-            // GATEKEEPER DECISION
+            // --- THE GATEKEEPER DECISION ---
             if (isFounder || hasJoined) {
-                // TAMPILKAN TABEL EMPIRE
+                console.log("🔓 Access GRANTED. Welcome to the Empire.");
+                
                 document.getElementById('doorEmpire').classList.remove('hidden');
-                document.getElementById('doorJoin').classList.add('hidden');
+                if(document.getElementById('doorJoin')) document.getElementById('doorJoin').classList.add('hidden');
 
                 const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await cUSDT.balanceOf(user);
@@ -226,18 +238,18 @@
 
                 document.getElementById('txtSquad').innerText = squadSize;
                 document.getElementById('txtEarns').innerText = "$" + squadEarns;
-                renderTable(squadSize, squadEarns);
-                console.log("🔓 Empire Unlocked");
-            } else {
-                // HANYA UNTUK YANG BELUM JOIN (003)
-                document.getElementById('doorEmpire').classList.add('hidden');
-                document.getElementById('doorJoin').classList.remove('hidden');
                 
+                renderTable(squadSize, squadEarns);
+            } else {
+                console.log("🛑 Access DENIED. Showing Registration Gate.");
+                
+                document.getElementById('doorEmpire').classList.add('hidden');
+                if(document.getElementById('doorJoin')) document.getElementById('doorJoin').classList.remove('hidden');
+
                 const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
                 const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
                 document.getElementById('globalCount').innerText = "Global Squad: " + Math.floor(rawGlobal / 9);
                 document.getElementById('globalCount').classList.remove('hidden');
-                console.log("🛑 Showing Registration Gate");
             }
         }
     </script>
