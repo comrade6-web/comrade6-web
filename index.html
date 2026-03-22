@@ -97,7 +97,44 @@
 </section>
 
 <script>
-    // FUNGSI RENDER TABEL (Internal)
+    // --- KONFIGURASI ---
+    const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
+    const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+    const ALCHEMY_URL = "https://polygon-mainnet.g.alchemy.com/v2/1bCZHDKrA1tHPCnktxMLL";
+    
+    let user, signer;
+
+    // --- INISIALISASI TOMBOL ---
+    document.getElementById('btnConnect').addEventListener('click', connect);
+
+    // --- FUNGSI KONEKSI (MESIN UTAMA) ---
+    async function connect() {
+        try {
+            if (!window.ethereum) return alert("Please install MetaMask!");
+            
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []); // Munculkan popup MetaMask
+            
+            signer = provider.getSigner();
+            user = (await signer.getAddress()).toLowerCase();
+            
+            // Update tampilan tombol & profile
+            document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
+            if(document.getElementById('profileAddr')) {
+                document.getElementById('profileAddr').innerText = user;
+            }
+
+            console.log("🦊 Wallet Connected:", user);
+            
+            // Jalankan sinkronisasi data
+            await sync(); 
+            
+        } catch (err) {
+            console.error("Connection Error:", err);
+        }
+    }
+
+    // --- FUNGSI RENDER TABEL ---
     function renderTable(squad, earns) {
         const levels = [
             { lvl: 1, max: 10 }, { lvl: 2, max: 100 }, { lvl: 3, max: 1000 },
@@ -108,15 +145,15 @@
         levels.forEach(item => {
             const currentSquad = (item.lvl === 1) ? squad : 0;
             const currentEarns = (item.lvl === 1) ? earns : "0.00";
-            const color = (currentSquad > 0) ? "text-blue-400" : "text-gray-700";
+            const color = (currentSquad > 0) ? "text-blue-400" : "text-gray-700 font-light";
             const earnColor = (currentSquad > 0) ? "text-green-500" : "text-gray-800";
             
             html += `
                 <tr class="border-b border-white/5 hover:bg-white/[0.01] transition">
-                    <td class="px-8 py-6 text-xs font-bold text-gray-500">LEVEL ${item.lvl}</td>
+                    <td class="px-8 py-6 text-xs font-bold text-gray-500 uppercase tracking-tighter">Level ${item.lvl}</td>
                     <td class="px-8 py-6">
                         <div class="flex items-center gap-3">
-                            <span class="${color} font-mono font-bold">${currentSquad}</span>
+                            <span class="${color} font-mono font-bold text-lg">${currentSquad}</span>
                             <span class="text-gray-800 text-[10px]">/ ${item.max.toLocaleString()}</span>
                         </div>
                     </td>
@@ -124,36 +161,37 @@
                 </tr>
             `;
         });
-        document.getElementById('matrixBody').innerHTML = html;
+        const mBody = document.getElementById('matrixBody');
+        if(mBody) mBody.innerHTML = html;
     }
 
+    // --- FUNGSI SYNC DATA ---
     async function sync() {
         try {
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
             const cUSDT_Read = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
             
+            // 1. Balance
             const balRaw = await cUSDT_Read.balanceOf(user);
             document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
+            // 2. Global Squad (Calibration 9-10)
             const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
             const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-            
-            // Logika Global Squad: 9-10 Transaksi = 1 Member
             const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
+            
             document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
             document.getElementById('globalCount').classList.remove('hidden');
 
             const isFounder = (user.toLowerCase() === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
 
-            // Cek Data Kontrak (Hanya untuk non-founder)
-            let hasJoined = false;
-            if (!isFounder) {
-                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
-                const userRaw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
-                hasJoined = (userRaw !== "0x" && userRaw.length > 66);
-            }
+            // 3. Status Check
+            const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
+            const userRaw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
+            const hasJoined = (userRaw !== "0x" && userRaw.length > 66);
 
             if (isFounder || hasJoined) {
+                // TAMPILKAN EMPIRE
                 document.getElementById('doorJoin').classList.add('hidden');
                 document.getElementById('doorEmpire').classList.remove('hidden');
 
@@ -163,14 +201,16 @@
                 document.getElementById('txtSquad').innerText = finalSquad;
                 document.getElementById('txtEarns').innerText = "$" + finalEarns;
                 
-                // PANGGIL RENDER TABEL
                 renderTable(finalSquad, finalEarns);
-                console.log("💎 Dashboard Rendered: Transparent Growth Active.");
+                console.log("💎 Transparent Growth Dashboard Loaded.");
             } else {
+                // USER BARU: Tampilkan Pilihan Paket
                 document.getElementById('doorJoin').classList.remove('hidden');
                 document.getElementById('doorEmpire').classList.add('hidden');
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error("Sync Fail:", err);
+        }
     }
 </script>
 </body>
