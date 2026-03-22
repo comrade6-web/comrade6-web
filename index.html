@@ -110,52 +110,53 @@ async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT (Tetap Aman)
+                // 1. Saldo USDT (Aman)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Global Squad
+                // 2. Global Count (Aman)
                 const gHex = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
                 const gVal = (gHex !== "0x") ? ethers.BigNumber.from(gHex).toString() : "0";
                 document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. BEDAH DATA MATRIX (3-Slot Precision)
+                // 3. AMBIL DATA MATRIX (Metode Kalibrasi v18.0)
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                 
-                console.log("🕵️ Slot Audit:", raw);
+                console.log("🔍 Slot Check:", raw);
 
-                if (raw && raw.length > 66) {
-                    const cleanRaw = raw.substring(2);
+                if (raw && raw !== "0x" && raw.length > 130) {
+                    const clean = raw.substring(2);
                     
-                    // Kita bedah 3 slot yang ada:
-                    // Slot 1 (0-64): ID
-                    // Slot 2 (64-128): Status
-                    // Slot 3 (128-192): Data Dinamis (Earnings atau TeamSize)
-                    
-                    const hexDataTiga = "0x" + cleanRaw.substring(128, 192);
-                    
-                    // Kita asumsikan Slot 3 adalah Team Size / Earnings
-                    const valTiga = ethers.BigNumber.from(hexDataTiga).toString();
-                    
-                    // Logic PPIC: Jika ini dompet Founder, tampilkan statistik Global sebagai bukti jaringan
-                    let displayTeam = valTiga;
-                    let displayEarns = (parseInt(valTiga) * 0.60).toFixed(2);
+                    // Kita bedah secara manual tapi teliti:
+                    // Slot 1 (0-64): Referrer Address (INI YANG TADI SALAH BACA JADI ANGKA RAKSASA)
+                    // Slot 2 (64-128): Package ID (Isinya biasanya 1 atau 6)
+                    // Slot 3 (128-192): Total Earnings
+                    // Slot 4 (192-256): Team Size (LEVEL 1)
 
-                    if(user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f") {
-                         displayTeam = (parseInt(gVal) > 0) ? (parseInt(gVal) - 1).toString() : "0";
-                         displayEarns = (parseInt(displayTeam) * 0.60).toFixed(2);
+                    const hexPackage = "0x" + clean.substring(64, 128);
+                    const hexEarns = "0x" + clean.substring(128, 192);
+                    const hexTeam = "0x" + clean.substring(192, 256);
+
+                    // Decode
+                    const hasJoined = ethers.BigNumber.from(hexPackage).gt(0);
+                    const finalEarns = ethers.utils.formatUnits(ethers.BigNumber.from(hexEarns), 6);
+                    const finalTeam = ethers.BigNumber.from(hexTeam).toString();
+
+                    console.log("✅ Decoded:", { hasJoined, finalTeam, finalEarns });
+
+                    if (hasJoined) {
+                        render(finalTeam, finalEarns);
+                    } else {
+                        render("0", "0.00");
                     }
-
-                    console.log("📊 Data Terdekripsi:", { team: displayTeam, earns: displayEarns });
-                    render(displayTeam, displayEarns);
                 } else {
                     render("0", "0.00");
                 }
 
             } catch (err) {
-                console.error("❌ Gagal Dekripsi:", err);
+                console.error("❌ Sync Error:", err);
                 render("0", "0.00");
             }
         }
