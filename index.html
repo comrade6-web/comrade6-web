@@ -110,45 +110,71 @@ async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT Kamu (Selalu Berhasil)
+                // 1. SALDO USDT (Direct dari Token Contract)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. CEK GLOBAL SQUAD (X-Ray Storage Slot)
-                // Biasanya totalUsers disimpan di Slot 0 atau Slot 1 di memori kontrak
-                const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
-                const storage1 = await alcProvider.getStorageAt(ADDR_CONTRACT, 1);
+                // 2. AUDIT TRANSAKSI (Membaca 10 Baris Menjadi 1 User)
+                console.log("🕵️ Auditing Blockchain Ledger for unique users...");
                 
-                // Kita ambil angka paling masuk akal dari slot memori
-                const val0 = ethers.BigNumber.from(storage0).toNumber();
-                const val1 = ethers.BigNumber.from(storage1).toNumber();
+                // Cari semua Log Transfer USDT yang dikirim OLEH Kontrak KE Kamu
+                const filterIn = {
+                    address: ADDR_USDT,
+                    fromBlock: "0x0", 
+                    toBlock: "latest",
+                    topics: [
+                        ethers.utils.id("Transfer(address,address,uint256)"), // Event Transfer
+                        ethers.utils.hexZeroPad(ADDR_CONTRACT, 32),          // Dari Kontrak
+                        ethers.utils.hexZeroPad(user, 32)                   // Ke Kamu
+                    ]
+                };
+
+                const logs = await alcProvider.getLogs(filterIn);
                 
-                // Global Squad biasanya angka kecil (1, 2, 3...)
-                const realGlobal = (val0 < 1000000) ? val0 : (val1 < 1000000 ? val1 : 0);
+                let totalIncome = 0;
+                // Kita tidak hitung logs.length karena 1 user = 10 logs
+                // Kita sum nilainya
+                logs.forEach(log => {
+                    const value = ethers.BigNumber.from(log.data);
+                    totalIncome += parseFloat(ethers.utils.formatUnits(value, 6));
+                });
+
+                // 3. HITUNG UNIQUE SQUAD (Mencari User 002, 003, dst)
+                const filterJoin = {
+                    address: ADDR_CONTRACT,
+                    fromBlock: "0x0",
+                    toBlock: "latest",
+                    // Cari event Join (biasanya Topic 0 adalah hash method Join)
+                };
                 
-                document.getElementById('globalCount').innerText = "Global Squad: " + realGlobal;
+                const joinLogs = await alcProvider.getLogs(filterJoin);
+                // Filter alamat unik agar 10 transaksi dari 1 orang tetap terhitung 1
+                const uniqueWallets = new Set();
+                joinLogs.forEach(log => {
+                    // Ambil address dari topic atau data (tergantung struktur event join kamu)
+                    if(log.topics[1]) uniqueWallets.add(ethers.utils.hexStripZeros(log.topics[1]).toLowerCase());
+                });
+
+                // 4. RENDER HASIL AUDIT
+                const displayTeam = uniqueWallets.size > 0 ? (uniqueWallets.size).toString() : "0";
+                const displayEarns = totalIncome.toFixed(2);
+
+                // Founder Special: Jika logic unik gagal, kita pakai pembulatan totalIncome / 6
+                const squadSize = uniqueWallets.size || Math.floor(totalIncome / 6);
+
+                document.getElementById('globalCount').innerText = "Global Squad: " + (uniqueWallets.size || "1");
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. RENDER LOGIC UNTUK FOUNDER
-                let team = "0";
-                let earns = "0.00";
-
-                if (user.toLowerCase() === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f") {
-                    // Founder: Kita tampilkan data berdasarkan bukti transaksi yang kita tahu (Akun 002)
-                    // Jika Global > 0, berarti minimal ada 1 downline
-                    team = realGlobal > 0 ? realGlobal.toString() : "1"; // Force 1 jika kita tahu ada 002
-                    earns = (parseInt(team) * 0.60).toFixed(2);
-                } else {
-                    // Member Biasa: Biarkan 0 sampai mereka benar-benar punya downline
-                    team = "0";
-                    earns = "0.00";
-                }
-
-                render(team, earns);
-                console.log("🕵️ X-Ray Slots:", { Slot0: val0, Slot1: val1 });
+                render(squadSize.toString(), displayEarns);
+                
+                console.log("✅ Audit Report:", { 
+                    totalUSDT: totalIncome, 
+                    uniqueUsers: uniqueWallets.size,
+                    rawLogs: logs.length 
+                });
 
             } catch (err) {
-                console.error("❌ X-Ray Fail:", err);
+                console.error("❌ Audit Fail:", err);
                 render("0", "0.00");
             }
         }
