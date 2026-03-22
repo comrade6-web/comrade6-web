@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comrade6 | World Community</title>
+    <title>Comrade6 | Community Matrix</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 font-size=%2280%22 font-weight=%22bold%22 font-style=%22italic%22 x=%2220%22 fill=%22white%22>6</text></svg>">
     
@@ -13,8 +13,8 @@
         body { font-family: 'Space Grotesk', sans-serif; background: #000; color: #fff; }
         .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
         .hidden { display: none !important; }
-        tr { border-bottom: 1px solid #111; }
-        .neon-blue { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        tr { border-bottom: 1px solid #111; transition: 0.3s; }
+        tr:hover { background: rgba(59, 130, 246, 0.03); }
     </style>
 </head>
 <body>
@@ -25,28 +25,28 @@
             <span>COMRADE<span class="text-blue-500">6</span></span>
         </div>
         <div class="text-right">
-            <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition">Connect Wallet</button>
-            <p id="globalCount" class="text-[8px] text-blue-500 mt-2 uppercase tracking-widest font-bold hidden tracking-widest">Global Squad: 0</p>
+            <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">Connect Wallet</button>
+            <p id="globalCount" class="text-[8px] text-blue-500 mt-2 uppercase tracking-[0.3em] font-bold hidden">Global Squad: 0</p>
         </div>
     </nav>
 
     <section class="max-w-5xl mx-auto text-center py-12 px-6">
-        <h1 class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-16 leading-tight">Transparent <br><span class="text-blue-500 neon-blue">Growth</span></h1>
+        <h1 class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-16 leading-tight">Transparent <br><span class="text-blue-500" style="text-shadow: 0 0 15px rgba(59,130,246,0.5)">Growth</span></h1>
 
         <div id="doorJoin" class="block">
-            <div class="max-w-xl mx-auto mb-10 p-8 glass rounded-[2rem] text-left">
-                <p class="text-[11px] text-gray-500 uppercase leading-relaxed font-bold">
-                    <input type="checkbox" id="checkRisk" class="mr-3 w-4 h-4 cursor-pointer accent-blue-600"> Legal Disclaimer: I understand this is a DECENTRALIZED PROTOCOL. Wallet security is my responsibility. Non-Refundable.
+            <div class="max-w-xl mx-auto mb-10 p-8 glass rounded-[2rem] text-left border-white/5">
+                <p class="text-[11px] text-gray-500 uppercase leading-relaxed font-bold tracking-wider">
+                    <input type="checkbox" id="checkRisk" class="mr-3 w-4 h-4 cursor-pointer accent-blue-600"> I understand this is a DECENTRALIZED PROTOCOL. Wallet security is my responsibility.
                 </p>
             </div>
-            <button id="btnJoin" class="bg-white text-black px-16 py-6 rounded-2xl text-2xl font-black italic uppercase active:scale-95 transition">ACTIVATE SQUAD - $6</button>
+            <button id="btnJoin" class="bg-white text-black px-16 py-6 rounded-2xl text-2xl font-black italic uppercase active:scale-95 transition hover:bg-blue-500 hover:text-white">ACTIVATE SQUAD - $6</button>
         </div>
 
-        <div id="doorEmpire" class="hidden">
+        <div id="doorEmpire" class="hidden animate-in fade-in duration-700">
             <div class="grid md:grid-cols-2 gap-6 mb-12 text-left">
                 <div class="glass p-8 rounded-[2rem] border-l-4 border-blue-600">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">USDT Wallet Balance</p>
-                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500 font-mono">$0.00</h3>
+                    <h3 id="txtBal" class="text-4xl font-bold text-blue-500 font-mono tracking-tighter">$0.00</h3>
                 </div>
                 <div class="glass p-8 rounded-[2rem] border-l-4 border-green-600">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Your Referral Link</p>
@@ -54,19 +54,19 @@
                 </div>
             </div>
 
-            <div class="glass p-10 rounded-[3rem] border-t-4 border-blue-600 shadow-2xl">
+            <div class="glass p-10 rounded-[3rem] border-t-4 border-blue-600 shadow-2xl relative">
                 <h2 class="text-2xl font-bold italic uppercase mb-12 text-center text-blue-400 tracking-[0.3em]">My Matrix Empire</h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left text-sm border-separate border-spacing-y-2">
                         <thead>
-                            <tr class="text-gray-600 uppercase text-[10px] tracking-[0.2em] border-b border-white/5">
-                                <th class="pb-6">Level</th>
+                            <tr class="text-gray-600 uppercase text-[10px] tracking-[0.2em]">
+                                <th class="pb-6 px-4">Level</th>
                                 <th class="pb-6">Squad Progress</th>
-                                <th class="pb-6 text-right">Earnings</th>
+                                <th class="pb-6 text-right px-4">Earnings</th>
                             </tr>
                         </thead>
                         <tbody id="matrixRows">
-                            <tr><td colspan="3" class="p-20 text-center text-blue-500/50 animate-pulse uppercase tracking-widest text-[10px] font-bold tracking-widest">Scanning Network...</td></tr>
+                            <tr><td colspan="3" class="p-20 text-center text-blue-500/50 animate-pulse uppercase tracking-widest text-[10px] font-bold">Synchronizing...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -106,47 +106,53 @@
             } catch (err) { console.error("Login Fail", err); }
         }
 
-async function sync() {
+        async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT (Ini Tetap Lewat Alchemy karena Pasti Tembus)
-                const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
-                const balRaw = await alcUSDT.balanceOf(user);
+                // 1. Saldo USDT
+                const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. DATA MATRIX (JALUR BYPASS POLYGONSCAN)
-                // Kita tanya langsung ke "Database" PolygonScan lewat API Publik
-                console.log("🕵️ Bypassing Node... Fetching from PolygonScan Indexer...");
+                // 2. Data Matrix (Hard Bypass Manual Hex)
+                // selector users(address) = 0xa87430ba
+                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 
-                const response = await fetch(`https://api.polygonscan.com/api?module=proxy&action=eth_call&to=${ADDR_CONTRACT}&data=0xa87430ba000000000000000000000000${user.replace('0x', '')}&tag=latest&apikey=YourApiKeyToken`);
-                const result = await response.json();
-
-                if (result.result && result.result !== "0x") {
-                    const raw = result.result;
-                    // Decoding Manual:
-                    const earnsHex = "0x" + raw.substring(130, 194);
-                    const teamHex = "0x" + raw.substring(194, 258);
+                console.log("🕵️ Matrix Scan Active...");
+                
+                try {
+                    const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                     
-                    const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earnsHex), 6);
-                    const team = ethers.BigNumber.from(teamHex).toString();
-
-                    console.log("✅ DATA BYPASS SUCCESS:", team, earns);
-                    render(team, earns);
-                } else {
+                    if (raw && raw !== "0x" && raw.length > 130) {
+                        // OFFSET Bedah Manual (Per 64 Karakter)
+                        // Karakter 130-194 = Earnings (USDT)
+                        // Karakter 194-258 = Team Size (Int)
+                        const eHex = "0x" + raw.substring(130, 194);
+                        const tHex = "0x" + raw.substring(194, 258);
+                        
+                        const eVal = ethers.utils.formatUnits(ethers.BigNumber.from(eHex), 6);
+                        const tVal = ethers.BigNumber.from(tHex).toString();
+                        
+                        console.log("✅ DATA TEMBUS:", tVal, eVal);
+                        render(tVal, eVal);
+                    } else {
+                        render("0", "0.00");
+                    }
+                } catch(e) {
+                    console.warn("Revert detected, rendering 0");
                     render("0", "0.00");
                 }
 
-                // 3. GLOBAL COUNT (Manual Call)
-                const resG = await fetch(`https://api.polygonscan.com/api?module=proxy&action=eth_call&to=${ADDR_CONTRACT}&data=0x16584090&tag=latest`);
-                const dataG = await resG.json();
-                const gUsers = ethers.BigNumber.from(dataG.result).toString();
-                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
-                document.getElementById('globalCount').classList.remove('hidden');
+                // 3. Global Stats
+                try {
+                    const gHex = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
+                    const gVal = ethers.BigNumber.from(gHex).toString();
+                    document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
+                    document.getElementById('globalCount').classList.remove('hidden');
+                } catch(e) {}
 
             } catch (err) {
-                console.warn("Bypass failed, showing default.");
-                render("0", "0.00");
+                console.error("Critical Fail", err);
             }
         }
 
@@ -156,13 +162,13 @@ async function sync() {
             const caps = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, "GLOBAL"];
             caps.forEach((cap, i) => {
                 const lvl = i + 1;
-                const rowTeam = (lvl === 1) ? team : "0";
-                const rowEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
+                const rTeam = (lvl === 1) ? team : "0";
+                const rEarn = (lvl === 1) ? parseFloat(earns).toFixed(2) : "0.00";
                 body.innerHTML += `
                     <tr class="glass">
-                        <td class="p-5 font-bold text-gray-400 uppercase text-[11px]">Level ${lvl}</td>
-                        <td class="p-5 font-mono"><span class="text-blue-400 font-bold">${rowTeam}</span> <span class="text-gray-800">/ ${cap.toLocaleString()}</span></td>
-                        <td class="p-5 text-green-500 font-bold font-mono text-right">$${rowEarn}</td>
+                        <td class="p-5 font-bold text-gray-400 uppercase text-[11px] px-4">Level ${lvl}</td>
+                        <td class="p-5 font-mono"><span class="text-blue-400 font-bold">${rTeam}</span> <span class="text-gray-800">/ ${cap.toLocaleString()}</span></td>
+                        <td class="p-5 text-green-500 font-bold font-mono text-right px-4">$${rEarn}</td>
                     </tr>`;
             });
         }
@@ -178,7 +184,7 @@ async function sync() {
                 const tx2 = await cSquad.join(ref, amount);
                 await tx2.wait();
                 location.reload();
-            } catch (err) { alert("Failed. Check USDT/Gas."); }
+            } catch (err) { alert("Fail. Check USDT/Gas."); }
         }
 
         function copyRef() {
