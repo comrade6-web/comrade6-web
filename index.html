@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comrade6 | World Community Protocol</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 font-size=%2280%22 font-weight=%22bold%22 font-style=%22italic%22 x=%2220%22 fill=%22white%22>6</text></svg>">
+    <title>Comrade6 | Transparent Growth</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -15,203 +15,163 @@
             min-height: 100vh;
         }
         .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-        .neon-border { box-shadow: 0 0 20px rgba(37, 99, 235, 0.2); }
         .hidden { display: none !important; }
-        
-        /* Disclaimer Scroll Lock */
-        #disclaimerArea::-webkit-scrollbar { width: 4px; }
-        #disclaimerArea::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
         <div class="flex items-center gap-2 font-bold italic text-2xl">
-            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white shadow-lg">6</div>
+            <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white">6</div>
             <span class="tracking-tighter">COMRADE<span class="text-blue-500">6</span></span>
         </div>
         <div class="flex flex-col items-end">
-            <button id="btnConnect" class="bg-blue-600 px-8 py-3 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition-all neon-border">Connect Wallet</button>
+            <button id="btnConnect" class="bg-blue-600 px-8 py-3 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition-all">Connect Wallet</button>
             <p id="globalCount" class="text-[9px] text-blue-400 mt-2 uppercase tracking-[0.3em] font-bold hidden">Global Squad: 0</p>
         </div>
     </nav>
 
-<section class="max-w-6xl mx-auto text-center py-20 px-6">
-    <h1 class="text-7xl md:text-8xl font-black italic uppercase tracking-tighter mb-6 leading-none">
-        Transparent <br><span class="text-blue-500" style="text-shadow: 0 0 30px rgba(59,130,246,0.3)">Growth</span>
-    </h1>
-    <p class="text-gray-400 max-w-2xl mx-auto mb-16 text-sm tracking-widest uppercase font-light">Decentralized Matrix Protocol • No Admin • 100% On-Chain</p>
+    <section class="max-w-6xl mx-auto text-center py-20 px-6">
+        <h1 class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-4 leading-none">
+            Transparent <br><span class="text-blue-500" style="text-shadow: 0 0 30px rgba(59,130,246,0.3)">Growth</span>
+        </h1>
+        <p class="text-gray-400 max-w-2xl mx-auto mb-16 text-[10px] md:text-xs tracking-[0.3em] uppercase font-light leading-loose">
+            Decentralized Matrix Protocol • No Admin • 100% On-Chain Immutable
+        </p>
 
-    <div id="doorEmpire" class="hidden animate-in slide-in-from-bottom duration-700">
-        <div class="grid md:grid-cols-3 gap-6 mb-12">
-            <div class="glass p-8 rounded-[2rem] border-l-2 border-blue-600 text-left">
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Total Earnings</p>
-                <h3 id="txtEarns" class="text-4xl font-black text-green-500 font-mono tracking-tighter">$0.00</h3>
-            </div>
-            <div class="glass p-8 rounded-[2rem] border-l-2 border-white/10 text-left">
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Squad Members</p>
-                <h3 id="txtSquad" class="text-4xl font-black text-blue-500 font-mono tracking-tighter">0</h3>
-            </div>
-            <div class="glass p-8 rounded-[2rem] border-l-2 border-white/10 text-left">
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Wallet Balance</p>
-                <h3 id="txtBal" class="text-4xl font-black text-white font-mono tracking-tighter">$0.00</h3>
+        <div id="doorJoin" class="hidden">
+            <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                <div class="glass p-10 rounded-[2.5rem] text-left">
+                    <h4 class="text-4xl font-black">$6</h4>
+                    <p class="text-gray-500 text-[10px] mt-2 uppercase">Lite Squad Entrance</p>
+                    <button class="mt-8 w-full bg-blue-600 py-4 rounded-xl font-bold uppercase text-[10px]">Join Squad</button>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] text-left">
+                    <h4 class="text-4xl font-black">$60</h4>
+                    <p class="text-gray-500 text-[10px] mt-2 uppercase">Alpha Squad Entrance</p>
+                    <button class="mt-8 w-full bg-white text-black py-4 rounded-xl font-bold uppercase text-[10px]">Join Squad</button>
+                </div>
             </div>
         </div>
 
-        <div class="glass rounded-[3rem] overflow-hidden border border-white/5 mb-12">
-            <div class="p-8 border-b border-white/5 flex justify-between items-center">
-                <h4 class="font-black italic uppercase tracking-widest text-sm">My Matrix Empire</h4>
-                <span class="text-[10px] text-blue-500 font-bold uppercase tracking-widest">Live On-Chain Data</span>
+        <div id="doorEmpire" class="hidden">
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="glass p-8 rounded-[2rem] border-l-2 border-blue-600 text-left">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Total Earnings</p>
+                    <h3 id="txtEarns" class="text-4xl font-black text-green-500 font-mono tracking-tighter">$0.00</h3>
+                </div>
+                <div class="glass p-8 rounded-[2rem] border-l-2 border-white/10 text-left">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Squad Members</p>
+                    <h3 id="txtSquad" class="text-4xl font-black text-blue-500 font-mono tracking-tighter">0</h3>
+                </div>
+                <div class="glass p-8 rounded-[2rem] border-l-2 border-white/10 text-left">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Wallet Balance</p>
+                    <h3 id="txtBal" class="text-4xl font-black text-white font-mono tracking-tighter">$0.00</h3>
+                </div>
             </div>
-            <div class="overflow-x-auto">
+
+            <div class="glass rounded-[3rem] overflow-hidden border border-white/5 mb-12">
+                <div class="p-8 border-b border-white/5 flex justify-between items-center">
+                    <h4 class="font-black italic uppercase tracking-widest text-xs">My Matrix Empire</h4>
+                    <span class="text-[9px] text-blue-500 font-bold uppercase tracking-widest">Live On-Chain Data</span>
+                </div>
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="text-[10px] text-gray-500 uppercase tracking-widest border-b border-white/5">
-                            <th class="px-8 py-6">Level</th>
-                            <th class="px-8 py-6">Squad Progress</th>
-                            <th class="px-8 py-6 text-right">Earnings</th>
+                        <tr class="text-[9px] text-gray-600 uppercase tracking-widest border-b border-white/5">
+                            <th class="px-8 py-4">Level</th>
+                            <th class="px-8 py-4">Progress</th>
+                            <th class="px-8 py-4 text-right">Earnings</th>
                         </tr>
                     </thead>
-                    <tbody id="matrixBody">
-                        </tbody>
+                    <tbody id="matrixBody"></tbody>
                 </table>
             </div>
-        </div>
 
-        <div class="glass p-10 rounded-[3rem] border-t border-white/5">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="glass p-10 rounded-[3rem] flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="flex items-center gap-4 text-left">
-                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-2xl font-black italic shadow-xl">C6</div>
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-black italic shadow-xl">C6</div>
                     <div>
-                        <p id="profileAddr" class="text-blue-400 font-mono text-[10px]">0x00...000</p>
-                        <span class="bg-blue-600/20 text-blue-400 text-[8px] px-2 py-1 rounded uppercase font-bold tracking-widest">Active Comrade</span>
+                        <p id="profileAddr" class="text-blue-400 font-mono text-[9px]">0x...000</p>
+                        <span class="bg-blue-600/20 text-blue-400 text-[7px] px-2 py-1 rounded uppercase font-bold tracking-widest">Active Comrade</span>
                     </div>
                 </div>
                 <div class="flex gap-4">
-                    <button id="btnCopy" class="bg-white text-black px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500 transition">Copy Ref</button>
-                    <button id="btnShare" class="glass border-blue-600/30 text-blue-400 px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 transition">Share</button>
+                    <button id="btnCopy" class="bg-white text-black px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-blue-500 transition">Copy Ref</button>
+                    <button id="btnShare" class="glass border-blue-600/30 text-blue-400 px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-blue-600 transition">Share</button>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<script>
-    // --- KONFIGURASI ---
-    const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
-    const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-    const ALCHEMY_URL = "https://polygon-mainnet.g.alchemy.com/v2/1bCZHDKrA1tHPCnktxMLL";
-    
-    let user, signer;
-
-    // --- INISIALISASI TOMBOL ---
-    document.getElementById('btnConnect').addEventListener('click', connect);
-
-    // --- FUNGSI KONEKSI (MESIN UTAMA) ---
-    async function connect() {
-        try {
-            if (!window.ethereum) return alert("Please install MetaMask!");
-            
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []); // Munculkan popup MetaMask
-            
-            signer = provider.getSigner();
-            user = (await signer.getAddress()).toLowerCase();
-            
-            // Update tampilan tombol & profile
-            document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
-            if(document.getElementById('profileAddr')) {
-                document.getElementById('profileAddr').innerText = user;
-            }
-
-            console.log("🦊 Wallet Connected:", user);
-            
-            // Jalankan sinkronisasi data
-            await sync(); 
-            
-        } catch (err) {
-            console.error("Connection Error:", err);
-        }
-    }
-
-    // --- FUNGSI RENDER TABEL ---
-    function renderTable(squad, earns) {
-        const levels = [
-            { lvl: 1, max: 10 }, { lvl: 2, max: 100 }, { lvl: 3, max: 1000 },
-            { lvl: 4, max: 10000 }, { lvl: 5, max: 100000 }, { lvl: 6, max: 1000000 }
-        ];
+    <script>
+        const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
+        const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+        const ALCHEMY_URL = "https://polygon-mainnet.g.alchemy.com/v2/1bCZHDKrA1tHPCnktxMLL";
         
-        let html = "";
-        levels.forEach(item => {
-            const currentSquad = (item.lvl === 1) ? squad : 0;
-            const currentEarns = (item.lvl === 1) ? earns : "0.00";
-            const color = (currentSquad > 0) ? "text-blue-400" : "text-gray-700 font-light";
-            const earnColor = (currentSquad > 0) ? "text-green-500" : "text-gray-800";
-            
-            html += `
-                <tr class="border-b border-white/5 hover:bg-white/[0.01] transition">
-                    <td class="px-8 py-6 text-xs font-bold text-gray-500 uppercase tracking-tighter">Level ${item.lvl}</td>
-                    <td class="px-8 py-6">
-                        <div class="flex items-center gap-3">
-                            <span class="${color} font-mono font-bold text-lg">${currentSquad}</span>
-                            <span class="text-gray-800 text-[10px]">/ ${item.max.toLocaleString()}</span>
-                        </div>
-                    </td>
-                    <td class="px-8 py-6 text-right font-mono font-bold ${earnColor}">$${currentEarns}</td>
-                </tr>
-            `;
-        });
-        const mBody = document.getElementById('matrixBody');
-        if(mBody) mBody.innerHTML = html;
-    }
+        let user, signer;
 
-    // --- FUNGSI SYNC DATA ---
-    async function sync() {
-        try {
+        document.getElementById('btnConnect').addEventListener('click', connect);
+
+        async function connect() {
+            try {
+                if (typeof window.ethers === 'undefined') return alert("Library Ethers not loaded!");
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                user = (await signer.getAddress()).toLowerCase();
+                
+                document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
+                document.getElementById('profileAddr').innerText = user;
+                
+                await sync();
+            } catch (err) { console.error("Connection Error:", err); }
+        }
+
+        function renderTable(squad, earns) {
+            const levels = [{lvl:1,max:10},{lvl:2,max:100},{lvl:3,max:1000},{lvl:4,max:10000},{lvl:5,max:100000},{lvl:6,max:1000000}];
+            let html = "";
+            levels.forEach(i => {
+                const isL1 = (i.lvl === 1);
+                html += `
+                    <tr class="border-b border-white/5">
+                        <td class="px-8 py-6 text-[10px] font-bold text-gray-500 uppercase">Lvl ${i.lvl}</td>
+                        <td class="px-8 py-6">
+                            <span class="${isL1 && squad>0 ? 'text-blue-400':'text-gray-800'} font-mono font-bold text-lg">${isL1 ? squad:0}</span>
+                            <span class="text-gray-800 text-[9px]"> / ${i.max.toLocaleString()}</span>
+                        </td>
+                        <td class="px-8 py-6 text-right font-mono font-bold ${isL1 && squad>0 ? 'text-green-500':'text-gray-900'}">$${isL1 ? earns:"0.00"}</td>
+                    </tr>`;
+            });
+            document.getElementById('matrixBody').innerHTML = html;
+        }
+
+        async function sync() {
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-            const cUSDT_Read = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
+            const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
             
-            // 1. Balance
-            const balRaw = await cUSDT_Read.balanceOf(user);
+            const balRaw = await cUSDT.balanceOf(user);
             document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-            // 2. Global Squad (Calibration 9-10)
             const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
             const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-            const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
+            const globalMemberCount = (rawGlobal >= 9) ? 1 : 0;
             
             document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
             document.getElementById('globalCount').classList.remove('hidden');
 
-            const isFounder = (user.toLowerCase() === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
+            const isFounder = (user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
 
-            // 3. Status Check
-            const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
-            const userRaw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
-            const hasJoined = (userRaw !== "0x" && userRaw.length > 66);
+            // Empire Visibility
+            document.getElementById('doorJoin').classList.add('hidden');
+            document.getElementById('doorEmpire').classList.remove('hidden');
 
-            if (isFounder || hasJoined) {
-                // TAMPILKAN EMPIRE
-                document.getElementById('doorJoin').classList.add('hidden');
-                document.getElementById('doorEmpire').classList.remove('hidden');
+            const squadSize = isFounder ? globalMemberCount : 0;
+            const squadEarns = (squadSize * 6.00).toFixed(2);
 
-                const finalSquad = isFounder ? globalMemberCount : 0;
-                const finalEarns = (finalSquad * 6.00).toFixed(2);
-
-                document.getElementById('txtSquad').innerText = finalSquad;
-                document.getElementById('txtEarns').innerText = "$" + finalEarns;
-                
-                renderTable(finalSquad, finalEarns);
-                console.log("💎 Transparent Growth Dashboard Loaded.");
-            } else {
-                // USER BARU: Tampilkan Pilihan Paket
-                document.getElementById('doorJoin').classList.remove('hidden');
-                document.getElementById('doorEmpire').classList.add('hidden');
-            }
-        } catch (err) {
-            console.error("Sync Fail:", err);
+            document.getElementById('txtSquad').innerText = squadSize;
+            document.getElementById('txtEarns').innerText = "$" + squadEarns;
+            renderTable(squadSize, squadEarns);
         }
-    }
-</script>
+    </script>
 </body>
 </html>
