@@ -173,38 +173,58 @@
             document.getElementById('matrixBody').innerHTML = html;
         }
 
-        async function sync() {
+async function sync() {
             console.log("🕵️ Auditor Mode: Syncing with Contract...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-            const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
-            const balRaw = await cUSDT.balanceOf(user);
-            document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
-
-            // --- 3. X-RAY STORAGE AUDIT ---
-            const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
-            const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
             
-            // LOGIC TEST: Every 9-10 transactions = 1 User
-            const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
+            // 1. CEK STATUS JOIN USER (PENTING!)
+            // Kita panggil data user dari kontrak untuk cek apakah dia sudah aktif
+            const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
+            const userRaw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
             
-            console.log("🔍 Global Index Detected:", rawGlobal);
-            console.log("👥 Unique Members Estimated:", globalMemberCount);
-
-            document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
-            document.getElementById('globalCount').classList.remove('hidden');
-            document.getElementById('doorEmpire').classList.remove('hidden');
-
+            // Logika: Jika data kontrak kosong/nol, berarti belum join
+            const hasJoined = (userRaw !== "0x" && userRaw !== "0x0000000000000000000000000000000000000000000000000000000000000000");
             const isFounder = (user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
-            const squadSize = isFounder ? globalMemberCount : 0;
-            
-            // Formula Test: Total Earns = Member Count * $6.00 (For Pioneer)
-            const squadEarns = (squadSize * 6.00).toFixed(2);
 
-            document.getElementById('txtSquad').innerText = squadSize;
-            document.getElementById('txtEarns').innerText = "$" + squadEarns;
-            renderTable(squadSize, squadEarns);
-            
-            console.log("✅ Audit Success: Syncing User", user);
+            // GATEKEEPER LOGIC
+            if (isFounder || hasJoined) {
+                // Tampilkan Dashboard Empire
+                document.getElementById('doorEmpire').classList.remove('hidden');
+                document.getElementById('doorJoin').classList.add('hidden'); // Sembunyikan pintu join
+                
+                // --- LANJUTKAN SYNC DATA ---
+                const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
+                const balRaw = await cUSDT.balanceOf(user);
+                document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
+
+                const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
+                const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
+                const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
+                
+                document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
+                document.getElementById('globalCount').classList.remove('hidden');
+
+                const squadSize = isFounder ? globalMemberCount : 0; // Logic sementara untuk testing
+                const squadEarns = (squadSize * 6.00).toFixed(2);
+
+                document.getElementById('txtSquad').innerText = squadSize;
+                document.getElementById('txtEarns').innerText = "$" + squadEarns;
+                renderTable(squadSize, squadEarns);
+                
+                console.log("✅ Member Authenticated. Welcome to the Empire.");
+            } else {
+                // USER BELUM JOIN: Tampilkan Pilihan Paket (Lite/Alpha)
+                document.getElementById('doorEmpire').classList.add('hidden');
+                document.getElementById('doorJoin').classList.remove('hidden');
+                console.log("🛑 Access Denied. User must join a squad first.");
+                
+                // Pastikan Global Count tetap muncul di landing page
+                const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
+                const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
+                const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
+                document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
+                document.getElementById('globalCount').classList.remove('hidden');
+            }
         }
     </script>
 </body>
