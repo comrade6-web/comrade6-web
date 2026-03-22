@@ -113,32 +113,58 @@
             } catch (err) { console.error("Auth Fail", err); }
         }
 
-        async function sync() {
+async function sync() {
             try {
-                // 1. Balance (Cepat lewat MetaMask)
+                // 1. Balance Check (Lewat MetaMask)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Data On-Chain (Prioritas lewat Alchemy VIP agar INSTAN)
-                const alchemyProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_VIP);
-                const alchemyContract = new ethers.Contract(ADDR_CONTRACT, [
-                    "function totalUsers() view returns (uint256)",
-                    "function users(address) view returns (address, uint256, uint256, uint256)"
-                ], alchemyProvider);
+                // 2. AMBIL DATA LEWAT JALUR "BULLETPROOF" (Manual Fetch ke Alchemy)
+                const response = await fetch(ALCHEMY_VIP, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        jsonrpc: "2.0",
+                        id: 1,
+                        method: "eth_call",
+                        params: [{
+                            to: ADDR_CONTRACT,
+                            // Data HEX untuk memanggil users(address)
+                            data: "0xa87430ba" + user.replace("0x", "").padStart(64, '0')
+                        }, "latest"]
+                    })
+                });
+                
+                const result = await response.json();
+                
+                // Decode Manual biar kencang
+                const hex = result.result;
+                const earnsHex = "0x" + hex.substring(130, 194);
+                const teamHex = "0x" + hex.substring(194, 258);
+                
+                const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earnsHex), 6);
+                const team = ethers.BigNumber.from(teamHex).toString();
 
-                const [gUsers, userData] = await Promise.all([
-                    alchemyContract.totalUsers(),
-                    alchemyContract.users(user)
-                ]);
+                // Ambil Global Users (Manual Fetch juga)
+                const resGlobal = await fetch(ALCHEMY_VIP, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        jsonrpc: "2.0",
+                        id: 2,
+                        method: "eth_call",
+                        params: [{ to: ADDR_CONTRACT, data: "0x16584090" }, "latest"] // totalUsers()
+                    })
+                });
+                const resG = await resGlobal.json();
+                const gUsers = ethers.BigNumber.from(resG.result).toString();
 
-                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
+                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                const team = userData[3].toString();
-                const earns = ethers.utils.formatUnits(userData[2], 6);
-                
                 render(team, earns);
-            } catch (e) { console.log("Alchemy Bypass Lag..."); }
+                console.log("Alchemy Bulletproof Success!");
+            } catch (e) { 
+                console.log("Bahkan Bulletproof pun gagal. Cek koneksi internet, Bro!"); 
+            }
         }
 
         function render(team, earns) {
