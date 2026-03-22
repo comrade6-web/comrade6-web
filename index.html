@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comrade6 | Transparent Growth Protocol</title>
     
-    <meta property="og:title" content="Comrade6 | Transparent Growth">
-    <meta property="og:description" content="100% Decentralized Matrix Protocol. No Admin. No Gimmicks. On-Chain Verified.">
-    <meta property="og:image" content="https://comrade6.com/preview.png"> 
-    <meta property="og:url" content="https://comrade6.com">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,7 +16,6 @@
         .hidden { display: none !important; }
         .glow-green { color: #22c55e; text-shadow: 0 0 15px rgba(34,197,94,0.4); }
         .glow-blue { color: #3b82f6; text-shadow: 0 0 15px rgba(59,130,246,0.4); }
-        details summary::-webkit-details-marker { display:none; }
     </style>
 </head>
 <body>
@@ -39,10 +33,7 @@
 
     <section class="max-w-6xl mx-auto text-center py-10 px-6">
         <h1 class="text-7xl md:text-9xl font-black italic uppercase tracking-tighter mb-4 leading-none">Transparent <br><span class="text-blue-500">Growth</span></h1>
-        <p class="text-gray-500 max-w-3xl mx-auto mb-16 text-[10px] md:text-xs tracking-[0.3em] uppercase font-medium opacity-80 leading-loose">
-            Decentralized Matrix Protocol • No Admin • 100% On-Chain Immutable
-        </p>
-
+        
         <div id="doorEmpire" class="hidden">
             <div id="captureArea" class="p-2">
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
@@ -79,16 +70,12 @@
                         <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black italic shadow-2xl">C6</div>
                         <div>
                             <p id="profileAddr" class="text-blue-400 font-mono text-sm font-bold tracking-tight">0x...000</p>
-                            <div class="flex gap-4 mt-2">
-                                <a id="polyLink" href="#" target="_blank" class="text-[9px] text-gray-500 uppercase font-bold tracking-widest hover:text-blue-400 underline">PolygonScan</a>
-                                <a href="https://www.youtube.com/@comradeworldcommunity" target="_blank" class="text-[9px] text-red-500 uppercase font-bold tracking-widest hover:text-red-400 underline italic font-black">Watch Tutorial</a>
-                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-4 w-full md:w-auto">
-                    <button onclick="takeScreenshot()" class="flex-1 bg-green-600 text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-green-500 transition-all shadow-xl">📸 Export Growth Proof</button>
-                    <button id="btnCopy" class="flex-1 bg-white text-black px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl">Copy Referral Link</button>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="takeScreenshot()" class="bg-green-600 text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-green-500">📸 Export Growth Proof</button>
+                    <button id="btnCopy" class="bg-white text-black px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white">Copy Referral Link</button>
                 </div>
             </div>
         </div>
@@ -96,32 +83,9 @@
         <div id="doorJoin" class="hidden mt-10">
             <div class="glass p-12 rounded-[3.5rem] text-center border-t-4 border-blue-600 animate-pulse">
                 <h2 class="text-3xl font-black uppercase italic mb-2">Join Lite Squad</h2>
-                <p class="text-blue-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-8">Direct Access via Protocol Pioneer</p>
-                <div class="flex flex-col gap-4 justify-center items-center">
-                    <button id="btnJoinLite" onclick="joinLite()" class="w-full md:w-64 bg-blue-600 text-white px-10 py-6 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.3)] transition-all transform hover:scale-105 active:scale-95">
-                        Activate $6 USDT
-                    </button>
-                    <a href="https://www.youtube.com/@comradeworldcommunity" target="_blank" class="text-[9px] text-gray-500 hover:text-red-500 uppercase font-bold tracking-widest transition-all">
-                        ❓ Need help? Watch Tutorial
-                    </a>
-                </div>
-                <div class="mt-8 pt-8 border-t border-white/5">
-                    <p class="text-[9px] text-gray-600 uppercase font-medium tracking-widest">Safe • On-Chain • Automated Distribution</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="max-w-3xl mx-auto mt-24 text-left">
-            <h3 class="text-xl font-black italic uppercase mb-8 border-b border-white/10 pb-4 tracking-[0.2em]">Protocol FAQ</h3>
-            <div class="space-y-4">
-                <details class="glass p-6 rounded-2xl group">
-                    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">What is Comrade6? <span class="text-blue-500 group-open:rotate-180 transition">+</span></summary>
-                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">Comrade6 is a 100% decentralized on-chain matrix protocol on the Polygon Network.</p>
-                </details>
-                <details class="glass p-6 rounded-2xl group">
-                    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">Distribution Rule: How It Works <span class="text-blue-500 group-open:rotate-180 transition">+</span></summary>
-                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">The protocol follow a strictly coded algorithm to distribute contributions in real-time.</p>
-                </details>
+                <button id="btnJoinLite" onclick="joinLite()" class="mt-8 bg-blue-600 text-white px-10 py-6 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 shadow-xl">
+                    Activate $6 USDT
+                </button>
             </div>
         </div>
     </section>
@@ -133,7 +97,6 @@
         
         let user, signer;
 
-        // REFERRAL LOGIC
         const urlParams = new URLSearchParams(window.location.search);
         const refLink = urlParams.get('ref');
         if (refLink) { localStorage.setItem('c6_upline', refLink.toLowerCase()); }
@@ -146,80 +109,41 @@
 
         async function connect() {
             try {
-                if (!window.ethereum) return window.open("https://www.youtube.com/@comradeworldcommunity", "_blank");
+                if (!window.ethereum) return window.open("https://youtube.com", "_blank");
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 user = (await signer.getAddress()).toLowerCase();
                 document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
                 document.getElementById('profileAddr').innerText = user;
-                document.getElementById('polyLink').href = `https://polygonscan.com/address/${user}#tokentxns`;
                 await sync();
-            } catch (err) { console.error("❌ Connection Fail:", err); }
+            } catch (err) { console.error(err); }
         }
 
-// --- MAHA KARYA: JOIN LITE FUNCTION (FIXED ABI) ---
-async function joinLite() {
+        async function joinLite() {
             try {
-                console.log("🚀 Starting Activation Process ($6 Micro-Unit)...");
                 const btn = document.getElementById('btnJoinLite');
-                btn.innerText = "PROCESSING..."; 
-                btn.disabled = true;
+                btn.innerText = "PROCESSING..."; btn.disabled = true;
+                const upline = localStorage.getItem('c6_upline') || "0x31838e2fa16f364b54b8f3b186f3aeed68df816f";
+                const cUSDT = new ethers.Contract(ADDR_USDT, ["function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"], signer);
+                const cCom = new ethers.Contract(ADDR_CONTRACT, ["function join(address,uint256)"], signer);
+                const packageValue = ethers.utils.parseUnits("6.0", 6);
 
-                const upline = (localStorage.getItem('c6_upline') || "0x31838e2fa16f364b54b8f3b186f3aeed68df816f").toLowerCase();
-                
-                const cUSDT = new ethers.Contract(ADDR_USDT, [
-                    "function approve(address spender, uint256 amount) returns (bool)", 
-                    "function allowance(address owner, address spender) view returns (uint256)"
-                ], signer);
-                
-                // KITA SESUAIKAN ABI DENGAN KONTRAK ASLI: join(address, uint256)
-                const cCom = new ethers.Contract(ADDR_CONTRACT, [
-                    "function join(address _referrer, uint256 _package)"
-                ], signer);
-
-                // Kontrak minta 6 USDT dengan desimal (6,000,000)
-                const packageValue = ethers.utils.parseUnits("6.0", 6); 
-
-                // 1. APPROVAL CHECK
                 const allowance = await cUSDT.allowance(user, ADDR_CONTRACT);
                 if (allowance.lt(packageValue)) {
                     const txApp = await cUSDT.approve(ADDR_CONTRACT, ethers.constants.MaxUint256);
                     await txApp.wait();
                 }
-
-                // 2. EKSEKUSI JOIN (Kirim packageValue, bukan angka 6!)
-                console.log("⚔️ Sending Join Transaction with 6,000,000 Micro-USDT...");
-                
-                // Di sini kuncinya: kita kirim 'packageValue' (6000000)
-                const txJoin = await cCom.join(upline, packageValue); 
-                
+                const txJoin = await cCom.join(upline, packageValue);
                 await txJoin.wait();
-                alert("🔥 SUCCESS! Welcome to the Empire, Comrade!");
                 location.reload();
-
-            } catch (err) {
-                console.error("❌ ERROR:", err);
-                alert("Transaction Failed! Check Console (F12).");
-                const btn = document.getElementById('btnJoinLite');
-                btn.innerText = "Activate $6 USDT";
-                btn.disabled = false;
-            }
-        }
-
-        async function takeScreenshot() {
-            const area = document.getElementById('captureArea');
-            const canvas = await html2canvas(area, { backgroundColor: '#000', scale: 2 });
-            const link = document.createElement('a');
-            link.download = `C6-Proof-${user.substring(0,6)}.png`;
-            link.href = canvas.toDataURL(); link.click();
+            } catch (err) { alert("Failed!"); btn.innerText = "Activate $6 USDT"; btn.disabled = false; }
         }
 
         function renderTable(squad, earns) {
             let html = "";
             for(let i=1; i<=9; i++) {
                 const max = Math.pow(10, i);
-                const distPot = (max * 6 * 0.05).toLocaleString(undefined, {minimumFractionDigits: 2});
                 const isL1 = i === 1;
                 html += `
                 <tr class="border-b border-white/5 transition hover:bg-white/[0.01]">
@@ -228,20 +152,19 @@ async function joinLite() {
                         <span class="${isL1 && squad>0 ? 'glow-blue':'text-gray-800'} font-mono font-bold text-xl">${isL1 ? squad:0}</span>
                         <span class="text-gray-800 text-[9px] font-bold"> / ${max.toLocaleString()}</span>
                     </td>
-                    <td class="px-10 py-7 text-[10px] text-gray-600 uppercase tracking-widest">Potential: <span class="text-blue-900 font-mono font-bold">$${distPot}</span></td>
-                    <td class="px-10 py-7 text-right font-mono font-bold ${isL1 && squad>0 ? 'glow-green':'text-gray-900'} text-lg">$${isL1 ? earns:"0.00"}</td>
+                    <td class="px-10 py-7 text-[10px] text-gray-600 uppercase tracking-widest text-right font-mono font-bold ${isL1 && squad>0 ? 'glow-green':'text-gray-900'} text-lg">$${isL1 ? earns:"0.00"}</td>
                 </tr>`;
             }
             document.getElementById('matrixBody').innerHTML = html;
         }
 
         async function sync() {
-            console.log("🕵️ Auditor Mode: Syncing Status...");
+            console.log("🕵️ Syncing Status...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
             const founderAddr = "0x31838e2fa16f364b54b8f3b186f3aeed68df816f".toLowerCase();
             const isFounder = (user.toLowerCase() === founderAddr);
+            
             let hasJoined = false;
-
             try {
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 const response = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
@@ -261,22 +184,21 @@ async function joinLite() {
 
                 const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
                 const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-                const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
-                document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
-                document.getElementById('globalCount').classList.remove('hidden');
+                
+                // LOGIKA SQUAD & EARNING FOUNDER (001)
+                const realTotalUser = (rawGlobal > 0) ? rawGlobal - 1 : 0; 
+                const squadSize = isFounder ? realTotalUser : 0; 
+                const totalEarned = (squadSize * 6.00).toFixed(2);
 
-                const squadSize = isFounder ? globalMemberCount : 0;
-                const squadEarns = (squadSize * 6.00).toFixed(2);
+                document.getElementById('globalCount').innerText = "Global Squad: " + realTotalUser;
+                document.getElementById('globalCount').classList.remove('hidden');
                 document.getElementById('txtSquad').innerText = squadSize;
-                document.getElementById('txtEarns').innerText = "$" + squadEarns;
-                renderTable(squadSize, squadEarns);
+                document.getElementById('txtEarns').innerText = "$" + totalEarned;
+                
+                renderTable(squadSize, totalEarned);
             } else {
                 document.getElementById('doorEmpire').classList.add('hidden');
                 document.getElementById('doorJoin').classList.remove('hidden');
-                const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
-                const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-                document.getElementById('globalCount').innerText = "Global Squad: " + Math.floor(rawGlobal / 9);
-                document.getElementById('globalCount').classList.remove('hidden');
             }
         }
     </script>
