@@ -177,22 +177,22 @@ async function sync() {
             console.log("🕵️ Auditor Mode: Syncing with Contract...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
             
-            // 1. CEK STATUS JOIN USER (PENTING!)
-            // Kita panggil data user dari kontrak untuk cek apakah dia sudah aktif
-            const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
-            const userRaw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
-            
-            // Logika: Jika data kontrak kosong/nol, berarti belum join
-            const hasJoined = (userRaw !== "0x" && userRaw !== "0x0000000000000000000000000000000000000000000000000000000000000000");
+            // 1. DEFINISI FOUNDER (JANGAN DIUBAH!)
             const isFounder = (user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
 
-            // GATEKEEPER LOGIC
+            // 2. CEK STATUS USER DI KONTRAK (VERSI AMAN)
+            // Kita panggil fungsi 'users' di contract
+            const contract = new ethers.Contract(ADDR_CONTRACT, ["function users(address) view returns (address, uint256, uint256, bool)"], alcProvider);
+            const userData = await contract.users(user);
+            const hasJoined = userData[3]; // Ini mengambil status 'bool' (true/false) dari kontrak
+
+            // --- THE GATEKEEPER LOGIC ---
             if (isFounder || hasJoined) {
-                // Tampilkan Dashboard Empire
+                // TAMPILKAN MAHA KARYA TABEL EMPIRE
                 document.getElementById('doorEmpire').classList.remove('hidden');
-                document.getElementById('doorJoin').classList.add('hidden'); // Sembunyikan pintu join
+                if(document.getElementById('doorJoin')) document.getElementById('doorJoin').classList.add('hidden');
                 
-                // --- LANJUTKAN SYNC DATA ---
+                // SYNC SALDO & GLOBAL DATA
                 const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
@@ -204,26 +204,28 @@ async function sync() {
                 document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                const squadSize = isFounder ? globalMemberCount : 0; // Logic sementara untuk testing
+                const squadSize = isFounder ? globalMemberCount : 0;
                 const squadEarns = (squadSize * 6.00).toFixed(2);
 
                 document.getElementById('txtSquad').innerText = squadSize;
                 document.getElementById('txtEarns').innerText = "$" + squadEarns;
+                
+                // PANGGIL MAHA KARYA TABEL (TIDAK BERUBAH)
                 renderTable(squadSize, squadEarns);
                 
-                console.log("✅ Member Authenticated. Welcome to the Empire.");
+                console.log("✅ Welcome Pioneer/Member.");
             } else {
-                // USER BELUM JOIN: Tampilkan Pilihan Paket (Lite/Alpha)
+                // USER BARU (003): TAMPILKAN PINTU JOIN
                 document.getElementById('doorEmpire').classList.add('hidden');
-                document.getElementById('doorJoin').classList.remove('hidden');
-                console.log("🛑 Access Denied. User must join a squad first.");
+                if(document.getElementById('doorJoin')) document.getElementById('doorJoin').classList.remove('hidden');
                 
-                // Pastikan Global Count tetap muncul di landing page
+                // Tetap munculkan Global Count biar 003 FOMO
                 const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
                 const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-                const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
-                document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
+                document.getElementById('globalCount').innerText = "Global Squad: " + Math.floor(rawGlobal / 9);
                 document.getElementById('globalCount').classList.remove('hidden');
+                
+                console.log("🛑 Redirected to Registration.");
             }
         }
     </script>
