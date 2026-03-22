@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comrade6 | Transparent Growth Protocol</title>
+    
+    <meta property="og:title" content="Comrade6 | Transparent Growth">
+    <meta property="og:description" content="100% Decentralized Matrix Protocol. No Admin. No Gimmicks. On-Chain Verified.">
+    <meta property="og:image" content="https://comrade6.com/preview.png"> <meta property="og:url" content="https://comrade6.com">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
     <style>
         body { font-family: 'Space Grotesk', sans-serif; background: radial-gradient(circle at top right, #1e3a8a 0%, #000 45%, #000 100%); color: #fff; min-height: 100vh; overflow-x: hidden; }
         .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.07); }
@@ -21,7 +27,7 @@
 
     <nav class="p-8 flex justify-between items-center max-w-7xl mx-auto">
         <div class="flex items-center gap-3 font-bold italic text-2xl tracking-tighter">
-            <div class="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]">6</div>
+            <div class="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">6</div>
             <span>COMRADE<span class="text-blue-500">6</span></span>
         </div>
         <div class="flex flex-col items-end">
@@ -30,13 +36,13 @@
         </div>
     </nav>
 
-    <section class="max-w-6xl mx-auto text-center py-12 px-6">
+    <section class="max-w-6xl mx-auto text-center py-10 px-6">
         <h1 class="text-7xl md:text-9xl font-black italic uppercase tracking-tighter mb-4 leading-none">Transparent <br><span class="text-blue-500">Growth</span></h1>
         <p class="text-gray-500 max-w-3xl mx-auto mb-16 text-[10px] md:text-xs tracking-[0.3em] uppercase font-medium opacity-80 leading-loose">
             Decentralized Matrix Protocol • No Admin • 100% On-Chain Immutable
         </p>
 
-        <div id="doorEmpire" class="hidden animate-in slide-in-from-bottom duration-1000">
+        <div id="doorEmpire" class="hidden">
             <div id="captureArea" class="p-2">
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
                     <div class="glass p-10 rounded-[2.5rem] border-l-4 border-green-500 text-left">
@@ -55,8 +61,8 @@
 
                 <div class="glass rounded-[3.5rem] overflow-hidden border border-white/5 mb-12 text-left">
                     <div class="p-8 border-b border-white/5 flex justify-between items-center">
-                        <h4 class="font-black italic uppercase tracking-[0.2em] text-xs">Empire Matrix (9 Levels)</h4>
-                        <span class="text-[9px] bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full font-bold uppercase tracking-widest">On-Chain Verified</span>
+                        <h4 class="font-black italic uppercase tracking-[0.2em] text-xs">Empire Distribution Ledger</h4>
+                        <span class="text-[9px] bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full font-bold uppercase tracking-widest tracking-widest">Protocol Verified</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -74,7 +80,7 @@
                             <p id="profileAddr" class="text-blue-400 font-mono text-sm font-bold tracking-tight">0x...000</p>
                             <div class="flex gap-4 mt-2">
                                 <a id="polyLink" href="#" target="_blank" class="text-[9px] text-gray-500 uppercase font-bold tracking-widest hover:text-blue-400 underline">PolygonScan</a>
-                                <a href="https://www.youtube.com/@comradeworldcommunity" target="_blank" class="text-[9px] text-red-500 uppercase font-bold tracking-widest hover:text-red-400 underline italic font-black">YouTube Tutorial</a>
+                                <a href="https://www.youtube.com/@comradeworldcommunity" target="_blank" class="text-[9px] text-red-500 uppercase font-bold tracking-widest hover:text-red-400 underline italic font-black">Watch Tutorial</a>
                             </div>
                         </div>
                     </div>
@@ -86,27 +92,19 @@
             </div>
         </div>
 
-<div class="max-w-3xl mx-auto mt-24 text-left">
-    <h3 class="text-xl font-black italic uppercase mb-8 border-b border-white/10 pb-4 tracking-[0.2em]">Protocol FAQ</h3>
-    <div class="space-y-4">
-        <details class="glass p-6 rounded-2xl group transition-all">
-            <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">
-                What is Comrade6? <span class="text-blue-500 group-open:rotate-180 transition">+</span>
-            </summary>
-            <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">
-                Comrade6 is a 100% decentralized on-chain matrix protocol on the Polygon Network. It operates autonomously without any central admin. Every transaction is a direct peer-to-peer distribution executed instantly by the smart contract.
-            </p>
-        </details>
-        <details class="glass p-6 rounded-2xl group transition-all">
-            <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">
-                Distribution Rule: How It Works <span class="text-blue-500 group-open:rotate-180 transition">+</span>
-            </summary>
-            <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">
-                The protocol follows a strictly coded algorithm to distribute every incoming $6 or $60 contribution. When a new member joins your matrix levels, the smart contract instantly calculates and triggers a distribution to the qualified upline wallets. This ensures that 100% of the funds are moved within the community ledger in real-time.
-            </p>
-        </details>
-    </div>
-</div>
+        <div class="max-w-3xl mx-auto mt-24 text-left">
+            <h3 class="text-xl font-black italic uppercase mb-8 border-b border-white/10 pb-4 tracking-[0.2em]">Protocol FAQ</h3>
+            <div class="space-y-4">
+                <details class="glass p-6 rounded-2xl group">
+                    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">What is Comrade6? <span class="text-blue-500 group-open:rotate-180 transition">+</span></summary>
+                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">Comrade6 is a 100% decentralized on-chain matrix protocol on the Polygon Network. It operates autonomously without any central admin. Every transaction is a direct peer-to-peer distribution executed instantly by the smart contract.</p>
+                </details>
+                <details class="glass p-6 rounded-2xl group">
+                    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">Distribution Rule: How It Works <span class="text-blue-500 group-open:rotate-180 transition">+</span></summary>
+                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">The protocol follow a strictly coded algorithm to distribute contributions. When a member joins, the smart contract instantly calculates and triggers distributions to the qualified upline wallets in real-time.</p>
+                </details>
+            </div>
+        </div>
     </section>
 
     <script>
@@ -116,10 +114,13 @@
         
         let user, signer;
 
-        // AUTO REFERRAL DETECTION
+        // --- 2. PERSISTENT REFERRAL LOGIC ---
         const urlParams = new URLSearchParams(window.location.search);
         const refLink = urlParams.get('ref');
-        if (refLink) localStorage.setItem('c6_ref', refLink);
+        if (refLink) {
+            localStorage.setItem('c6_upline', refLink.toLowerCase());
+            console.log("💾 Referral Locked In:", refLink);
+        }
 
         document.getElementById('btnConnect').addEventListener('click', connect);
         document.getElementById('btnCopy').addEventListener('click', () => {
@@ -134,11 +135,13 @@
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 user = (await signer.getAddress()).toLowerCase();
+                
                 document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
                 document.getElementById('profileAddr').innerText = user;
                 document.getElementById('polyLink').href = `https://polygonscan.com/address/${user}#tokentxns`;
+                
                 await sync();
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("❌ Connection Fail:", err); }
         }
 
         async function takeScreenshot() {
@@ -154,7 +157,7 @@
             let html = "";
             for(let i=1; i<=9; i++) {
                 const max = Math.pow(10, i);
-                const roiVal = (max * 6 * 0.05).toLocaleString(undefined, {minimumFractionDigits: 2});
+                const distPot = (max * 6 * 0.05).toLocaleString(undefined, {minimumFractionDigits: 2});
                 const isL1 = i === 1;
                 html += `
                 <tr class="border-b border-white/5 transition hover:bg-white/[0.01]">
@@ -163,10 +166,7 @@
                         <span class="${isL1 && squad>0 ? 'glow-blue':'text-gray-800'} font-mono font-bold text-xl">${isL1 ? squad:0}</span>
                         <span class="text-gray-800 text-[9px] font-bold tracking-widest"> / ${max.toLocaleString()}</span>
                     </td>
-                    <td class="px-10 py-7">
-                        <span class="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Max ROI:</span>
-                        <span class="text-blue-900 font-mono font-bold ml-1">$${roiVal}</span>
-                    </td>
+                    <td class="px-10 py-7 text-[10px] text-gray-600 uppercase tracking-widest">Potential: <span class="text-blue-900 font-mono font-bold">$${distPot}</span></td>
                     <td class="px-10 py-7 text-right font-mono font-bold ${isL1 && squad>0 ? 'glow-green':'text-gray-900'} text-lg">$${isL1 ? earns:"0.00"}</td>
                 </tr>`;
             }
@@ -174,26 +174,37 @@
         }
 
         async function sync() {
+            console.log("🕵️ Auditor Mode: Syncing with Contract...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
             const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
             const balRaw = await cUSDT.balanceOf(user);
             document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
+            // --- 3. X-RAY STORAGE AUDIT ---
             const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
             const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-            const globalMemberCount = (rawGlobal >= 9) ? 1 : 0;
             
+            // LOGIC TEST: Every 9-10 transactions = 1 User
+            const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
+            
+            console.log("🔍 Global Index Detected:", rawGlobal);
+            console.log("👥 Unique Members Estimated:", globalMemberCount);
+
             document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
             document.getElementById('globalCount').classList.remove('hidden');
             document.getElementById('doorEmpire').classList.remove('hidden');
 
             const isFounder = (user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
             const squadSize = isFounder ? globalMemberCount : 0;
+            
+            // Formula Test: Total Earns = Member Count * $6.00 (For Pioneer)
             const squadEarns = (squadSize * 6.00).toFixed(2);
 
             document.getElementById('txtSquad').innerText = squadSize;
             document.getElementById('txtEarns').innerText = "$" + squadEarns;
             renderTable(squadSize, squadEarns);
+            
+            console.log("✅ Audit Success: Syncing User", user);
         }
     </script>
 </body>
