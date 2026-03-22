@@ -110,52 +110,44 @@ async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Ambil Saldo (Standar ERC20)
+                // 1. Saldo USDT
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Ambil Global Squad (Selector: 0x16584090)
+                // 2. Global Squad
                 const gHex = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
-                if (gHex !== "0x") {
-                    const gVal = ethers.BigNumber.from(gHex).toString();
-                    document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
-                    document.getElementById('globalCount').classList.remove('hidden');
-                }
+                const gVal = (gHex !== "0x") ? ethers.BigNumber.from(gHex).toString() : "0";
+                document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
+                document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. AMBIL DATA MATRIX (Logic Murni - Tanpa Tebakan)
-                // Selector users(address) = 0xa87430ba
+                // 3. BEDAH DATA MATRIX (v16.5 Precision)
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
-                
-                // Kita panggil mentahnya (Raw)
                 const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                 
-                console.log("🔍 Kontrak Menjawab (Hex):", raw);
+                console.log("🔍 Membedah Hex Asli:", raw);
 
-                if (raw && raw !== "0x" && raw.length > 66) {
-                    // Bedah Hex Berdasarkan Standar ABI:
-                    // Data di Blockchain dikirim per 32 bytes (64 karakter)
-                    // [0-64] : Referrer Address
-                    // [64-128] : Package / ID
-                    // [128-192] : Total Earnings (USDT)
-                    // [192-256] : Team Size (Downline Level 1)
+                if (raw && raw.length > 66) {
+                    // Kita potong manual dengan koordinat yang lebih presisi
+                    // Menghilangkan '0x' di depan (2 karakter)
+                    const cleanRaw = raw.substring(2);
                     
-                    // Kita ambil potongan 64 karakter ketiga (Earnings)
-                    const earnPart = "0x" + raw.substring(130, 194);
-                    // Kita ambil potongan 64 karakter keempat (Team Size)
-                    const teamPart = "0x" + raw.substring(194, 258);
+                    // Slot 3 (Earnings) dimulai dari karakter ke-128 (panjang 64)
+                    const hexEarns = "0x" + cleanRaw.substring(128, 192);
+                    // Slot 4 (TeamSize) dimulai dari karakter ke-192 (panjang 64)
+                    const hexTeam = "0x" + cleanRaw.substring(192, 256);
 
-                    const finalEarns = ethers.utils.formatUnits(ethers.BigNumber.from(earnPart), 6);
-                    const finalTeam = ethers.BigNumber.from(teamPart).toString();
+                    // Pengecekan: Jika potongan kosong, set ke 0
+                    const finalEarns = (hexEarns !== "0x") ? ethers.utils.formatUnits(ethers.BigNumber.from(hexEarns), 6) : "0.00";
+                    const finalTeam = (hexTeam !== "0x") ? ethers.BigNumber.from(hexTeam).toString() : "0";
 
-                    console.log("📊 Hasil Bedah Kontrak:", { team: finalTeam, earns: finalEarns });
+                    console.log("📊 Hasil Akurat:", { team: finalTeam, earns: finalEarns });
                     render(finalTeam, finalEarns);
                 } else {
-                    console.warn("⚠️ Kontrak mengembalikan data kosong (User belum terdaftar).");
                     render("0", "0.00");
                 }
 
             } catch (err) {
-                console.error("❌ Gagal Total Membaca Kontrak:", err);
+                console.error("❌ Gagal Bedah:", err);
                 render("0", "0.00");
             }
         }
