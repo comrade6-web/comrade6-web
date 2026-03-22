@@ -108,45 +108,39 @@
         }
 
 async function sync() {
+            // 1. BUAT PROVIDER (Alchemy VIP)
+            const alchemyProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
+
+            // 2. CEK SALDO USDT (Harus Muncul!)
             try {
-                // KITA GUNAKAN ALCHEMY UNTUK SEMUANYA (Saldo + Matrix)
-                const alchemyProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-                
-                // Kontrak USDT lewat Alchemy
                 const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alchemyProvider);
-                
-                // Kontrak Squad lewat Alchemy
+                const balRaw = await alcUSDT.balanceOf(user);
+                const realBal = parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
+                document.getElementById('txtBal').innerText = "$" + realBal;
+                console.log("Saldo USDT Sukses:", realBal);
+            } catch (e) { 
+                console.error("Gagal Baca Saldo USDT:", e);
+                document.getElementById('txtBal').innerText = "RPC Error";
+            }
+
+            // 3. CEK DATA MATRIX (Pisahkan agar tidak merusak saldo)
+            try {
                 const alcSquad = new ethers.Contract(ADDR_CONTRACT, [
                     "function totalUsers() view returns (uint256)",
                     "function users(address) view returns (address, uint256, uint256, uint256)"
                 ], alchemyProvider);
 
-                console.log("Dual Syncing via Alchemy VIP...");
-                
-                // Tarik semua data sekaligus (Paralel)
-                const [balRaw, gUsers, userData] = await Promise.all([
-                    alcUSDT.balanceOf(user),
-                    alcSquad.totalUsers(),
-                    alcSquad.users(user)
-                ]);
-
-                // Tampilkan Saldo (Format 6 Desimal untuk USDT Polygon)
-                const realBal = parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
-                document.getElementById('txtBal').innerText = "$" + realBal;
-
-                // Tampilkan Global Count
+                const gUsers = await alcSquad.totalUsers();
                 document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // Tampilkan Matrix
-                const earns = ethers.utils.formatUnits(userData[2], 6);
-                const team = userData[3].toString();
+                const userData = await alcSquad.users(user);
+                render(userData[3].toString(), ethers.utils.formatUnits(userData[2], 6));
                 
-                render(team, earns);
-                console.log("Dual Sync Success! Bal:", realBal);
-
             } catch (e) { 
-                console.error("Critical Sync Error:", e);
+                console.error("Matrix Reverted! Cek Alamat Kontrak:", e);
+                // Jika Matrix gagal, tampilkan 0 biar tidak "Syncing" terus
+                render("0", "0.00");
             }
         }
 
