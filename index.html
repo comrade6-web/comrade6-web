@@ -194,35 +194,50 @@ async function sync() {
                 const balRaw = await cUSDT_Read.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Ambil Global Squad dari Slot 0 (Data Terjujur: 9 atau 10)
+                // 2. Global Squad (Dikalibrasi: 9-10 Transaksi = 1 Member)
                 const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
                 const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
+                const globalMemberCount = (rawGlobal >= 9) ? Math.floor(rawGlobal / 9) : 0;
                 
-                // Tampilkan Global Squad (Biar terlihat ramai, tampilkan rawGlobal saja)
-                document.getElementById('globalCount').innerText = "Global Squad: " + rawGlobal;
+                document.getElementById('globalCount').innerText = "Global Squad: " + globalMemberCount;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. LOGIKA KHUSUS FOUNDER (User 001) - REFINED
-                if (user.toLowerCase() === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f") {
-                    
-                    // REFINED LOGIC: 
-                    // Kita tahu 10 transaksi = 1 User. 
-                    // Jika rawGlobal adalah 9 atau 10, maka itu adalah 1 User (User 002).
-                    // Rumus: Bagi 10, lalu bulatkan ke bawah.
-                    const squadSize = Math.max(Math.floor(rawGlobal / 9), 0); 
-                    // Kita pakai pembagi 9 atau 10 tergantung index awal kamu. 
-                    // Jika saat ini rawGlobal = 9 dan itu adalah 1 user, maka:
-                    const finalSquad = (rawGlobal >= 9) ? "1" : "0";
-                    const finalEarns = (parseInt(finalSquad) * 6.00).toFixed(2);
+                // 3. LOGIKA STATUS JOIN (Check if User is 001 or already has data)
+                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
+                const userRaw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
+                
+                // Jika user adalah Founder (001) ATAU data kontrak menunjukkan sudah join
+                const isFounder = (user.toLowerCase() === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
+                const hasJoined = (userRaw !== "0x" && userRaw.length > 66);
+
+                if (isFounder || hasJoined) {
+                    // TAMPILKAN EMPIRE
+                    document.getElementById('doorJoin').classList.add('hidden');
+                    document.getElementById('doorEmpire').classList.remove('hidden');
+
+                    let finalSquad = "0";
+                    let finalEarns = "0.00";
+
+                    if (isFounder) {
+                        finalSquad = globalMemberCount.toString();
+                        finalEarns = (globalMemberCount * 6.00).toFixed(2);
+                    } else {
+                        // Untuk User 002, ambil dari data Hex jika ada
+                        // Sementara kita set 0 jika belum punya downline
+                        finalSquad = "0";
+                        finalEarns = "0.00";
+                    }
 
                     document.getElementById('txtSquad').innerText = finalSquad;
                     document.getElementById('txtEarns').innerText = "$" + finalEarns;
                     
-                    showEmpire();
-                    console.log("✅ Founder Sync: Data Aligned with PolygonScan.");
+                    // RE-RENDER TABLE (PENTING: Pastikan fungsi render() kamu ada di script)
+                    if (typeof render === "function") render(finalSquad, finalEarns);
+                    
                 } else {
-                    // Cek jika user biasa sudah join (Package > 0)
-                    // (Tambahkan logic cek join di sini jika perlu)
+                    // USER BARU: Tampilkan pilihan paket
+                    document.getElementById('doorJoin').classList.remove('hidden');
+                    document.getElementById('doorEmpire').classList.add('hidden');
                 }
 
             } catch (err) {
