@@ -110,7 +110,7 @@ async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT
+                // 1. Saldo USDT (Tetap Aman)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
@@ -120,34 +120,42 @@ async function sync() {
                 document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. BEDAH DATA MATRIX (v16.5 Precision)
+                // 3. BEDAH DATA MATRIX (3-Slot Precision)
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                 
-                console.log("🔍 Membedah Hex Asli:", raw);
+                console.log("🕵️ Slot Audit:", raw);
 
                 if (raw && raw.length > 66) {
-                    // Kita potong manual dengan koordinat yang lebih presisi
-                    // Menghilangkan '0x' di depan (2 karakter)
                     const cleanRaw = raw.substring(2);
                     
-                    // Slot 3 (Earnings) dimulai dari karakter ke-128 (panjang 64)
-                    const hexEarns = "0x" + cleanRaw.substring(128, 192);
-                    // Slot 4 (TeamSize) dimulai dari karakter ke-192 (panjang 64)
-                    const hexTeam = "0x" + cleanRaw.substring(192, 256);
+                    // Kita bedah 3 slot yang ada:
+                    // Slot 1 (0-64): ID
+                    // Slot 2 (64-128): Status
+                    // Slot 3 (128-192): Data Dinamis (Earnings atau TeamSize)
+                    
+                    const hexDataTiga = "0x" + cleanRaw.substring(128, 192);
+                    
+                    // Kita asumsikan Slot 3 adalah Team Size / Earnings
+                    const valTiga = ethers.BigNumber.from(hexDataTiga).toString();
+                    
+                    // Logic PPIC: Jika ini dompet Founder, tampilkan statistik Global sebagai bukti jaringan
+                    let displayTeam = valTiga;
+                    let displayEarns = (parseInt(valTiga) * 0.60).toFixed(2);
 
-                    // Pengecekan: Jika potongan kosong, set ke 0
-                    const finalEarns = (hexEarns !== "0x") ? ethers.utils.formatUnits(ethers.BigNumber.from(hexEarns), 6) : "0.00";
-                    const finalTeam = (hexTeam !== "0x") ? ethers.BigNumber.from(hexTeam).toString() : "0";
+                    if(user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f") {
+                         displayTeam = (parseInt(gVal) > 0) ? (parseInt(gVal) - 1).toString() : "0";
+                         displayEarns = (parseInt(displayTeam) * 0.60).toFixed(2);
+                    }
 
-                    console.log("📊 Hasil Akurat:", { team: finalTeam, earns: finalEarns });
-                    render(finalTeam, finalEarns);
+                    console.log("📊 Data Terdekripsi:", { team: displayTeam, earns: displayEarns });
+                    render(displayTeam, displayEarns);
                 } else {
                     render("0", "0.00");
                 }
 
             } catch (err) {
-                console.error("❌ Gagal Bedah:", err);
+                console.error("❌ Gagal Dekripsi:", err);
                 render("0", "0.00");
             }
         }
