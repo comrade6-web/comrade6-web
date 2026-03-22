@@ -110,75 +110,63 @@ async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. SALDO USDT (Direct dari Token Contract)
+                // 1. SALDO USDT (Tetap lewat Alchemy karena Simple)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. AUDIT TRANSAKSI (Membaca 10 Baris Menjadi 1 User)
-                console.log("🕵️ Auditing Blockchain Ledger for unique users...");
+                // 2. AUDIT LEWAT POLYGONSCAN (Bypass Limit 10 Block Alchemy)
+                console.log("🕵️ Bypassing Alchemy... Auditing via PolygonScan API...");
                 
-                // Cari semua Log Transfer USDT yang dikirim OLEH Kontrak KE Kamu
-                const filterIn = {
-                    address: ADDR_USDT,
-                    fromBlock: "0x0", 
-                    toBlock: "latest",
-                    topics: [
-                        ethers.utils.id("Transfer(address,address,uint256)"), // Event Transfer
-                        ethers.utils.hexZeroPad(ADDR_CONTRACT, 32),          // Dari Kontrak
-                        ethers.utils.hexZeroPad(user, 32)                   // Ke Kamu
-                    ]
-                };
+                // Ganti Alamat Kontrak & USDT ke Huruf Kecil untuk Filter
+                const contractAddr = ADDR_CONTRACT.toLowerCase();
+                const userAddr = user.toLowerCase();
 
-                const logs = await alcProvider.getLogs(filterIn);
-                
-                let totalIncome = 0;
-                // Kita tidak hitung logs.length karena 1 user = 10 logs
-                // Kita sum nilainya
-                logs.forEach(log => {
-                    const value = ethers.BigNumber.from(log.data);
-                    totalIncome += parseFloat(ethers.utils.formatUnits(value, 6));
-                });
+                // Kita ambil history transfer USDT (ERC20) kamu
+                // Link ini publik, limitnya 5 panggilan per detik (sangat cukup)
+                const apiURL = `https://api.polygonscan.com/api?module=account&action=tokentx&contractaddress=${ADDR_USDT}&address=${userAddr}&startblock=0&endblock=99999999&sort=desc&apikey=YourApiKeyToken`;
 
-                // 3. HITUNG UNIQUE SQUAD (Mencari User 002, 003, dst)
-                const filterJoin = {
-                    address: ADDR_CONTRACT,
-                    fromBlock: "0x0",
-                    toBlock: "latest",
-                    // Cari event Join (biasanya Topic 0 adalah hash method Join)
-                };
-                
-                const joinLogs = await alcProvider.getLogs(filterJoin);
-                // Filter alamat unik agar 10 transaksi dari 1 orang tetap terhitung 1
-                const uniqueWallets = new Set();
-                joinLogs.forEach(log => {
-                    // Ambil address dari topic atau data (tergantung struktur event join kamu)
-                    if(log.topics[1]) uniqueWallets.add(ethers.utils.hexStripZeros(log.topics[1]).toLowerCase());
-                });
+                const response = await fetch(apiURL);
+                const data = await response.json();
 
-                // 4. RENDER HASIL AUDIT
-                const displayTeam = uniqueWallets.size > 0 ? (uniqueWallets.size).toString() : "0";
-                const displayEarns = totalIncome.toFixed(2);
+                if (data.status === "1" && data.result) {
+                    // FILTER: Ambil hanya transfer yang berasal DARI Kontrak Kamu
+                    const myCredits = data.result.filter(tx => tx.from.toLowerCase() === contractAddr);
+                    
+                    // A. HITUNG EARNINGS (Sum All)
+                    let totalIncome = 0;
+                    myCredits.forEach(tx => {
+                        totalIncome += parseFloat(ethers.utils.formatUnits(tx.value, 6));
+                    });
 
-                // Founder Special: Jika logic unik gagal, kita pakai pembulatan totalIncome / 6
-                const squadSize = uniqueWallets.size || Math.floor(totalIncome / 6);
+                    // B. HITUNG UNIQUE USERS (Alignment Logic)
+                    // Karena 1 user = 1 hash transaksi yang sama untuk 10 baris distribusi
+                    // Kita kumpulkan Transaction Hash yang unik
+                    const uniqueTX = new Set();
+                    myCredits.forEach(tx => uniqueTX.add(tx.hash));
 
-                document.getElementById('globalCount').innerText = "Global Squad: " + (uniqueWallets.size || "1");
-                document.getElementById('globalCount').classList.remove('hidden');
+                    const squadSize = uniqueTX.size; // 10 baris dengan hash sama akan terhitung 1
+                    const displayEarns = totalIncome.toFixed(2);
 
-                render(squadSize.toString(), displayEarns);
-                
-                console.log("✅ Audit Report:", { 
-                    totalUSDT: totalIncome, 
-                    uniqueUsers: uniqueWallets.size,
-                    rawLogs: logs.length 
-                });
+                    console.log("✅ Audit Result:", { 
+                        incomes: totalIncome, 
+                        squad: squadSize,
+                        txFound: myCredits.length 
+                    });
+
+                    render(squadSize.toString(), displayEarns);
+                    document.getElementById('globalCount').innerText = "Global Squad: " + (squadSize || "1");
+                    document.getElementById('globalCount').classList.remove('hidden');
+
+                } else {
+                    console.warn("PolygonScan API returned empty or error.");
+                    render("0", "0.00");
+                }
 
             } catch (err) {
-                console.error("❌ Audit Fail:", err);
+                console.error("❌ Final Audit Fail:", err);
                 render("0", "0.00");
             }
         }
-
         function render(team, earns) {
             const body = document.getElementById('matrixRows');
             body.innerHTML = "";
