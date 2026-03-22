@@ -158,29 +158,60 @@
             } catch (err) { console.error("❌ Connection Fail:", err); }
         }
 
-        // --- MAHA KARYA: JOIN LITE FUNCTION ---
+// --- MAHA KARYA: JOIN LITE FUNCTION (FIXED ABI) ---
         async function joinLite() {
             try {
+                console.log("🚀 Starting Activation Process...");
                 const btn = document.getElementById('btnJoinLite');
-                btn.innerText = "PROCESSING..."; btn.disabled = true;
+                btn.innerText = "PROCESSING..."; 
+                btn.disabled = true;
 
+                // 1. Ambil Upline & Signer
                 const upline = localStorage.getItem('c6_upline') || "0x31838e2fa16f364b54b8f3b186f3aeed68df816f";
-                const cUSDT = new ethers.Contract(ADDR_USDT, ["function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"], signer);
-                const cCom = new ethers.Contract(ADDR_CONTRACT, ["function join(address,uint256)"], signer);
+                
+                // 2. Definisi Kontrak dengan ABI yang Lebih Lengkap & Benar
+                const cUSDT = new ethers.Contract(ADDR_USDT, [
+                    "function approve(address spender, uint256 amount) returns (bool)", 
+                    "function allowance(address owner, address spender) view returns (uint256)"
+                ], signer);
+                
+                const cCom = new ethers.Contract(ADDR_CONTRACT, [
+                    "function join(address _upline, uint256 _packageId)"
+                ], signer);
+
                 const amount = ethers.utils.parseUnits("6.0", 6);
 
+                // 3. STEP 1: Cek & Approve USDT
+                console.log("🔍 Checking allowance...");
                 const allowance = await cUSDT.allowance(user, ADDR_CONTRACT);
+                
                 if (allowance.lt(amount)) {
-                    const txApp = await cUSDT.approve(ADDR_CONTRACT, amount);
+                    console.log("✍️ Requesting Approval...");
+                    const txApp = await cUSDT.approve(ADDR_CONTRACT, ethers.utils.parseUnits("1000000", 6)); // Approve besar sekalian biar gak kerja dua kali
                     await txApp.wait();
+                    console.log("✅ Approved!");
                 }
 
-                const txJoin = await cCom.join(upline, 1);
+                // 4. STEP 2: Eksekusi JOIN (Fungsi Utama)
+                console.log("⚔️ Sending Join Transaction to Contract...");
+                // Kita pastikan parameter dikirim dengan benar: (address, uint)
+                const txJoin = await cCom.join(upline, 1, { gasLimit: 300000 }); 
+                
+                console.log("⏳ Waiting for Confirmation...");
                 await txJoin.wait();
-                alert("Welcome Comrade! Empire Unlocked.");
+                
+                alert("🔥 SUCCESS! Welcome to the Empire, Comrade!");
                 location.reload();
+
             } catch (err) {
-                console.error(err); alert("Transaction Failed!");
+                console.error("❌ ERROR DETAIL:", err);
+                
+                // Pesan error ramah user
+                let msg = "Transaction Failed!";
+                if (err.code === 4001) msg = "User denied transaction.";
+                if (err.message.includes("insufficient funds")) msg = "Not enough MATIC for gas!";
+                
+                alert(msg);
                 document.getElementById('btnJoinLite').innerText = "Activate $6 USDT";
                 document.getElementById('btnJoinLite').disabled = false;
             }
