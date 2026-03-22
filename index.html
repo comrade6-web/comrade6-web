@@ -159,17 +159,13 @@
         }
 
 // --- MAHA KARYA: JOIN LITE FUNCTION (FIXED ABI) ---
-        async function joinLite() {
+async function joinLite() {
             try {
-                console.log("🚀 Starting Activation Process...");
                 const btn = document.getElementById('btnJoinLite');
-                btn.innerText = "PROCESSING..."; 
-                btn.disabled = true;
+                btn.innerText = "PROCESSING..."; btn.disabled = true;
 
-                // 1. Ambil Upline & Signer
                 const upline = localStorage.getItem('c6_upline') || "0x31838e2fa16f364b54b8f3b186f3aeed68df816f";
                 
-                // 2. Definisi Kontrak dengan ABI yang Lebih Lengkap & Benar
                 const cUSDT = new ethers.Contract(ADDR_USDT, [
                     "function approve(address spender, uint256 amount) returns (bool)", 
                     "function allowance(address owner, address spender) view returns (uint256)"
@@ -181,37 +177,36 @@
 
                 const amount = ethers.utils.parseUnits("6.0", 6);
 
-                // 3. STEP 1: Cek & Approve USDT
-                console.log("🔍 Checking allowance...");
+                // 1. CEK ALLOWANCE
                 const allowance = await cUSDT.allowance(user, ADDR_CONTRACT);
-                
                 if (allowance.lt(amount)) {
-                    console.log("✍️ Requesting Approval...");
-                    const txApp = await cUSDT.approve(ADDR_CONTRACT, ethers.utils.parseUnits("1000000", 6)); // Approve besar sekalian biar gak kerja dua kali
+                    const txApp = await cUSDT.approve(ADDR_CONTRACT, ethers.constants.MaxUint256);
                     await txApp.wait();
-                    console.log("✅ Approved!");
+                    console.log("✅ Approval Success");
                 }
 
-                // 4. STEP 2: Eksekusi JOIN (Fungsi Utama)
-                console.log("⚔️ Sending Join Transaction to Contract...");
-                // Kita pastikan parameter dikirim dengan benar: (address, uint)
-                const txJoin = await cCom.join(upline, 1, { gasLimit: 300000 }); 
+                // 2. EKSEKUSI JOIN DENGAN AUTO-GAS ESTIMATION
+                console.log("⚔️ Estimating gas and joining...");
                 
-                console.log("⏳ Waiting for Confirmation...");
+                // Biarkan ethers menghitung gas secara dinamis
+                const txJoin = await cCom.join(upline, 1); 
+                
+                console.log("⏳ Transaction Sent:", txJoin.hash);
                 await txJoin.wait();
                 
-                alert("🔥 SUCCESS! Welcome to the Empire, Comrade!");
+                alert("🔥 SUCCESS! Welcome to the Empire.");
                 location.reload();
 
             } catch (err) {
-                console.error("❌ ERROR DETAIL:", err);
+                console.error("❌ Detail Error:", err);
                 
-                // Pesan error ramah user
-                let msg = "Transaction Failed!";
-                if (err.code === 4001) msg = "User denied transaction.";
-                if (err.message.includes("insufficient funds")) msg = "Not enough MATIC for gas!";
+                // Cek jika error karena bensin (gas) habis
+                if (err.message.includes("intrinsic gas too low") || err.message.includes("out of gas")) {
+                    alert("Error: Gas limit too low. Please try again with 'Aggressive' gas setting in MetaMask.");
+                } else {
+                    alert("Transaction Failed! Check your POL (Matic) balance for gas fees.");
+                }
                 
-                alert(msg);
                 document.getElementById('btnJoinLite').innerText = "Activate $6 USDT";
                 document.getElementById('btnJoinLite').disabled = false;
             }
