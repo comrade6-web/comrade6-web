@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comrade6 | World Community</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text y=%22.9em%22 font-size=%2280%22 font-weight=%22bold%22 font-style=%22italic%22 x=%2220%22 fill=%22white%22>6</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -23,7 +26,7 @@
         </div>
         <div class="text-right">
             <button id="btnConnect" class="bg-blue-600 px-6 py-2 rounded-full text-[10px] font-bold uppercase hover:bg-blue-700 transition">Connect Wallet</button>
-            <p id="globalCount" class="text-[8px] text-blue-500 mt-2 uppercase tracking-widest font-bold hidden">Global Squad: 0</p>
+            <p id="globalCount" class="text-[8px] text-blue-500 mt-2 uppercase tracking-widest font-bold hidden tracking-widest">Global Squad: 0</p>
         </div>
     </nav>
 
@@ -63,15 +66,13 @@
                             </tr>
                         </thead>
                         <tbody id="matrixRows">
-                            <tr><td colspan="3" class="p-20 text-center text-blue-500/50 animate-pulse uppercase tracking-widest text-[10px] font-bold">Syncing Data...</td></tr>
+                            <tr><td colspan="3" class="p-20 text-center text-blue-500/50 animate-pulse uppercase tracking-widest text-[10px] font-bold tracking-widest">Scanning Network...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </section>
-
-    <footer class="py-20 text-center text-[10px] text-gray-800 uppercase tracking-[0.4em] font-bold">© 2026 COMRADE6 WORLD COMMUNITY</footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script>
@@ -92,10 +93,8 @@
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 user = (await signer.getAddress()).toLowerCase();
-                
                 document.getElementById('btnConnect').innerText = user.substring(0,6)+"..."+user.substring(38);
                 
-                // Kontrak untuk Transaksi (Pake MetaMask)
                 cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) external returns (bool)"], signer);
                 cSquad = new ethers.Contract(ADDR_CONTRACT, ["function join(address, uint256) external"], signer);
 
@@ -107,49 +106,52 @@
             } catch (err) { console.error("Login Fail", err); }
         }
 
-async function sync() {
+        async function sync() {
             try {
-                const alchemyProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-                
-                // 1. CEK SALDO USDT
-                const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alchemyProvider);
+                const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
+
+                // 1. Saldo USDT (Manual Call)
+                const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await alcUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. CEK DATA MATRIX (Logger Mode)
-                const alcSquad = new ethers.Contract(ADDR_CONTRACT, [
-                    "function totalUsers() view returns (uint256)",
-                    "function users(address) view returns (address, uint256, uint256, uint256)"
-                ], alchemyProvider);
+                // 2. Data Matrix (Manual Hex Decoder)
+                // users(address) selector: 0xa87430ba
+                const cleanAddr = user.replace("0x", "").toLowerCase().padStart(64, '0');
+                const dataHex = "0xa87430ba" + cleanAddr;
 
-                console.log("🕵️ Audit Start for User:", user);
+                console.log("🕵️ Scanning Contract Memory...");
+                const rawResult = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
 
-                // Panggil data Global
-                const gUsers = await alcSquad.totalUsers();
-                document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
-                document.getElementById('globalCount').classList.remove('hidden');
+                if (rawResult && rawResult !== "0x") {
+                    // Pembedahan Manual Hex (Setiap data = 32 bytes / 64 karakter)
+                    // [0]: Referrer (0-64)
+                    // [1]: Package (64-128)
+                    // [2]: Earnings (128-192) -> USDT 6 desimal
+                    // [3]: TeamSize (192-256)
+                    const earningsHex = "0x" + rawResult.substring(130, 194);
+                    const teamHex = "0x" + rawResult.substring(194, 258);
 
-                // Panggil data User (002)
-                const userData = await alcSquad.users(user);
-                
-                // --- LOG DATA UNTUK FOUNDER ---
-                console.log("📊 Raw Data from Contract:", {
-                    referrer: userData[0],
-                    package: userData[1].toString(),
-                    earnings: ethers.utils.formatUnits(userData[2], 6),
-                    teamSize: userData[3].toString()
-                });
+                    const earns = ethers.utils.formatUnits(ethers.BigNumber.from(earningsHex), 6);
+                    const team = ethers.BigNumber.from(teamHex).toString();
 
-                // Jika Package > 0 (Artinya sudah Join)
-                if (parseInt(userData[1].toString()) > 0) {
-                    render(userData[3].toString(), ethers.utils.formatUnits(userData[2], 6));
+                    console.log("✅ Data Found - Team:", team, "Earns:", earns);
+                    render(team, earns);
                 } else {
-                    console.warn("⚠️ User ini belum terdaftar di kontrak ADDR_CONTRACT!");
+                    console.warn("⚠️ Contract returned empty memory.");
                     render("0", "0.00");
                 }
 
-            } catch (e) { 
-                console.error("❌ Audit Fail:", e);
+                // 3. Global Stats
+                try {
+                    const resGlobal = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
+                    const gUsers = ethers.BigNumber.from(resGlobal).toString();
+                    document.getElementById('globalCount').innerText = "Global Squad: " + gUsers;
+                    document.getElementById('globalCount').classList.remove('hidden');
+                } catch(e) {}
+
+            } catch (err) {
+                console.error("❌ Deep Scan Error:", err);
                 render("0", "0.00");
             }
         }
@@ -165,7 +167,7 @@ async function sync() {
                 body.innerHTML += `
                     <tr class="glass">
                         <td class="p-5 font-bold text-gray-400 uppercase text-[11px]">Level ${lvl}</td>
-                        <td class="p-5"><span class="text-blue-400 font-bold">${rowTeam}</span> <span class="text-gray-800">/ ${cap.toLocaleString()}</span></td>
+                        <td class="p-5 font-mono"><span class="text-blue-400 font-bold">${rowTeam}</span> <span class="text-gray-800">/ ${cap.toLocaleString()}</span></td>
                         <td class="p-5 text-green-500 font-bold font-mono text-right">$${rowEarn}</td>
                     </tr>`;
             });
@@ -182,12 +184,12 @@ async function sync() {
                 const tx2 = await cSquad.join(ref, amount);
                 await tx2.wait();
                 location.reload();
-            } catch (err) { alert("Failed! Check USDT/POL balance."); }
+            } catch (err) { alert("Failed. Check USDT/Gas."); }
         }
 
         function copyRef() {
             navigator.clipboard.writeText("https://comrade6.com/?ref=" + user);
-            alert("Copied!");
+            alert("Referral Link Copied!");
         }
     </script>
 </body>
