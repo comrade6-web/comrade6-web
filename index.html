@@ -108,38 +108,48 @@
         }
 
 async function sync() {
-            // 1. BUAT PROVIDER (Alchemy VIP)
-            const alchemyProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-
-            // 2. CEK SALDO USDT (Harus Muncul!)
             try {
+                const alchemyProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
+                
+                // 1. CEK SALDO USDT
                 const alcUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alchemyProvider);
                 const balRaw = await alcUSDT.balanceOf(user);
-                const realBal = parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
-                document.getElementById('txtBal').innerText = "$" + realBal;
-                console.log("Saldo USDT Sukses:", realBal);
-            } catch (e) { 
-                console.error("Gagal Baca Saldo USDT:", e);
-                document.getElementById('txtBal').innerText = "RPC Error";
-            }
+                document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-            // 3. CEK DATA MATRIX (Pisahkan agar tidak merusak saldo)
-            try {
+                // 2. CEK DATA MATRIX (Logger Mode)
                 const alcSquad = new ethers.Contract(ADDR_CONTRACT, [
                     "function totalUsers() view returns (uint256)",
                     "function users(address) view returns (address, uint256, uint256, uint256)"
                 ], alchemyProvider);
 
+                console.log("🕵️ Audit Start for User:", user);
+
+                // Panggil data Global
                 const gUsers = await alcSquad.totalUsers();
                 document.getElementById('globalCount').innerText = "Global Squad: " + gUsers.toString();
                 document.getElementById('globalCount').classList.remove('hidden');
 
+                // Panggil data User (002)
                 const userData = await alcSquad.users(user);
-                render(userData[3].toString(), ethers.utils.formatUnits(userData[2], 6));
                 
+                // --- LOG DATA UNTUK FOUNDER ---
+                console.log("📊 Raw Data from Contract:", {
+                    referrer: userData[0],
+                    package: userData[1].toString(),
+                    earnings: ethers.utils.formatUnits(userData[2], 6),
+                    teamSize: userData[3].toString()
+                });
+
+                // Jika Package > 0 (Artinya sudah Join)
+                if (parseInt(userData[1].toString()) > 0) {
+                    render(userData[3].toString(), ethers.utils.formatUnits(userData[2], 6));
+                } else {
+                    console.warn("⚠️ User ini belum terdaftar di kontrak ADDR_CONTRACT!");
+                    render("0", "0.00");
+                }
+
             } catch (e) { 
-                console.error("Matrix Reverted! Cek Alamat Kontrak:", e);
-                // Jika Matrix gagal, tampilkan 0 biar tidak "Syncing" terus
+                console.error("❌ Audit Fail:", e);
                 render("0", "0.00");
             }
         }
