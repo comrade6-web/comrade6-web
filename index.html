@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background: radial-gradient(circle at top right, #1e3a8a 0%, #000 45%, #000 100%); color: #fff; min-height: 100vh; }
+        body { font-family: 'Space Grotesk', sans-serif; background: radial-gradient(circle at top right, #1e3a8a 0%, #000 45%, #000 100%); color: #fff; min-height: 100vh; overflow-x: hidden; }
         .glass { background: rgba(255,255,255,0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.07); }
         .hidden { display: none !important; }
         .glow-green { color: #22c55e; text-shadow: 0 0 15px rgba(34,197,94,0.4); }
@@ -21,101 +21,84 @@
 
     <nav class="p-8 flex justify-between items-center max-w-7xl mx-auto">
         <div class="flex items-center gap-3 font-bold italic text-2xl tracking-tighter">
-            <div class="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">6</div>
+            <div class="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]">6</div>
             <span>COMRADE<span class="text-blue-500">6</span></span>
         </div>
         <div class="flex flex-col items-end">
-            <button id="btnConnect" class="bg-blue-600 px-10 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl">Connect Wallet</button>
+            <button id="btnConnect" class="bg-blue-600 px-10 py-3.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95">Connect Wallet</button>
             <p id="globalCount" class="text-[9px] text-blue-400 mt-2 uppercase tracking-[0.4em] font-bold hidden">Global Squad: 0</p>
         </div>
     </nav>
 
     <section class="max-w-6xl mx-auto text-center py-12 px-6">
         <h1 class="text-7xl md:text-9xl font-black italic uppercase tracking-tighter mb-4 leading-none">Transparent <br><span class="text-blue-500">Growth</span></h1>
-        <p class="text-gray-500 max-w-3xl mx-auto mb-16 text-[10px] md:text-xs tracking-[0.3em] uppercase font-medium opacity-80">Decentralized Matrix Protocol • No Admin • 100% On-Chain Immutable</p>
+        <p class="text-gray-500 max-w-3xl mx-auto mb-16 text-[10px] md:text-xs tracking-[0.3em] uppercase font-medium opacity-80 leading-loose">
+            Decentralized Matrix Protocol • No Admin • 100% On-Chain Immutable
+        </p>
 
         <div id="doorEmpire" class="hidden animate-in slide-in-from-bottom duration-1000">
-            <div id="captureArea" class="p-4">
+            <div id="captureArea" class="p-2">
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
                     <div class="glass p-10 rounded-[2.5rem] border-l-4 border-green-500 text-left">
                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Total Earnings</p>
                         <h3 id="txtEarns" class="text-5xl font-black glow-green font-mono tracking-tighter">$0.00</h3>
                     </div>
                     <div class="glass p-10 rounded-[2.5rem] border-l-4 border-blue-600 text-left">
-                        <p id="labelSquad" class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Squad Members</p>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Squad Members</p>
                         <h3 id="txtSquad" class="text-5xl font-black glow-blue font-mono tracking-tighter">0</h3>
                     </div>
                     <div class="glass p-10 rounded-[2.5rem] border-l-4 border-white/10 text-left">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1 font-mono">My Wallet</p>
-                        <h3 id="txtBal" class="text-4xl font-black text-white font-mono tracking-tighter">$0.00</h3>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Wallet Balance</p>
+                        <h3 id="txtBal" class="text-5xl font-black text-white font-mono tracking-tighter">$0.00</h3>
                     </div>
                 </div>
 
                 <div class="glass rounded-[3.5rem] overflow-hidden border border-white/5 mb-12 text-left">
-                    <table class="w-full">
-                        <tbody id="matrixBody"></tbody>
-                    </table>
+                    <div class="p-8 border-b border-white/5 flex justify-between items-center">
+                        <h4 class="font-black italic uppercase tracking-[0.2em] text-xs">Empire Matrix (9 Levels)</h4>
+                        <span class="text-[9px] bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full font-bold uppercase tracking-widest">On-Chain Verified</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <tbody id="matrixBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <div class="glass p-12 rounded-[3.5rem] flex flex-col md:flex-row justify-between items-center gap-10">
                 <div class="flex flex-col text-left gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-xl font-black italic shadow-2xl">C6</div>
-                        <p id="profileAddr" class="text-blue-400 font-mono text-sm font-bold">0x...000</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <a id="polyLink" href="#" target="_blank" class="text-[9px] text-gray-500 uppercase font-bold tracking-widest hover:text-blue-400 underline">PolygonScan</a>
-                        <a href="https://youtube.com/@Comrade6Tutorial" target="_blank" class="text-[9px] text-red-500 uppercase font-bold tracking-widest hover:text-red-400 underline">YouTube Tutorial</a>
+                        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black italic shadow-2xl">C6</div>
+                        <div>
+                            <p id="profileAddr" class="text-blue-400 font-mono text-sm font-bold tracking-tight">0x...000</p>
+                            <div class="flex gap-4 mt-2">
+                                <a id="polyLink" href="#" target="_blank" class="text-[9px] text-gray-500 uppercase font-bold tracking-widest hover:text-blue-400 underline">PolygonScan</a>
+                                <a href="https://www.youtube.com/@comradeworldcommunity" target="_blank" class="text-[9px] text-red-500 uppercase font-bold tracking-widest hover:text-red-400 underline italic font-black">YouTube Tutorial</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-4 w-full md:w-auto">
-                    <button onclick="takeScreenshot()" class="flex-1 bg-green-600 text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase hover:bg-green-500 transition-all">📸 Export Proof</button>
-                    <button onclick="shareText()" class="flex-1 bg-blue-600 text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase hover:bg-blue-500 transition-all">🔗 Share Link</button>
-                    <button id="btnCopy" class="flex-1 bg-white text-black px-8 py-4 rounded-xl text-[10px] font-black uppercase transition-all hover:bg-gray-200">Copy Ref</button>
+                    <button onclick="takeScreenshot()" class="flex-1 bg-green-600 text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-green-500 transition-all shadow-xl">📸 Export Growth Proof</button>
+                    <button id="btnCopy" class="flex-1 bg-white text-black px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl">Copy Referral Link</button>
                 </div>
             </div>
         </div>
 
-<div class="max-w-3xl mx-auto mt-24 text-left">
-    <h3 class="text-xl font-black italic uppercase mb-8 border-b border-white/10 pb-4 tracking-[0.2em]">Protocol FAQ</h3>
-    <div class="space-y-4">
-        <details class="glass p-6 rounded-2xl group transition-all">
-            <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">
-                What is Comrade6? 
-                <span class="text-blue-500 group-open:rotate-180 transition-transform duration-300">+</span>
-            </summary>
-            <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">
-                Comrade6 is a 100% decentralized on-chain matrix protocol built on the Polygon Network. It operates autonomously without any human intervention or central admin. All distributions are executed instantly by the smart contract, ensuring total transparency and immutability.
-            </p>
-        </details>
-
-        <details class="glass p-6 rounded-2xl group transition-all">
-            <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">
-                How does the 5% ROI work? 
-                <span class="text-blue-500 group-open:rotate-180 transition-transform duration-300">+</span>
-            </summary>
-            <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">
-                The protocol allocates a specific percentage from every new participant within your matrix levels directly to your wallet. For instance, in a Level 1 scenario with 10 participants contributing $6 each (Total $60), the protocol instantly verifies and triggers a 5% distribution ($3.00) to the qualified upline wallet. This process is fully automated and peer-to-peer.
-            </p>
-        </details>
-
-        <details class="glass p-6 rounded-2xl group transition-all">
-            <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">
-                Is my capital safe? 
-                <span class="text-blue-500 group-open:rotate-180 transition-transform duration-300">+</span>
-            </summary>
-            <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">
-                Since the protocol is decentralized, there is no "company account" or "admin wallet" that holds your funds. Every transaction is a direct transfer between participants' wallets via the smart contract. Once deployed, the rules of the contract cannot be changed or deleted by anyone.
-            </p>
-        </details>
-    </div>
-</div>
-
-<div class="flex gap-4 mt-4">
-    <a id="polyLink" href="#" target="_blank" class="text-[9px] text-gray-500 uppercase font-bold tracking-widest hover:text-blue-400 underline">PolygonScan</a>
-    <a href="https://www.youtube.com/@comradeworldcommunity" target="_blank" class="text-[9px] text-red-500 uppercase font-bold tracking-widest hover:text-red-400 underline italic">Watch Tutorial</a>
-</div>
+        <div class="max-w-3xl mx-auto mt-24 text-left">
+            <h3 class="text-xl font-black italic uppercase mb-8 border-b border-white/10 pb-4 tracking-[0.2em]">Protocol FAQ</h3>
+            <div class="space-y-4">
+                <details class="glass p-6 rounded-2xl group transition-all">
+                    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">What is Comrade6? <span class="text-blue-500 group-open:rotate-180 transition-transform duration-300">+</span></summary>
+                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">Comrade6 is a 100% decentralized on-chain matrix protocol built on the Polygon Network. It operates autonomously without any central admin. All distributions are executed instantly by the smart contract.</p>
+                </details>
+                <details class="glass p-6 rounded-2xl group transition-all">
+                    <summary class="font-bold text-sm cursor-pointer list-none flex justify-between uppercase tracking-widest">How does the 5% ROI work? <span class="text-blue-500 group-open:rotate-180 transition-transform duration-300">+</span></summary>
+                    <p class="mt-4 text-[11px] text-gray-500 leading-relaxed uppercase tracking-tight opacity-80">The protocol allocates a specific percentage from every new participant within your levels directly to your wallet. For Level 1 (10 participants @ $6 = $60 total), the protocol triggers a 5% distribution ($3.00) instantly.</p>
+                </details>
+            </div>
+        </div>
     </section>
 
     <script>
@@ -123,7 +106,7 @@
         const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const ALCHEMY_URL = "https://polygon-mainnet.g.alchemy.com/v2/1bCZHDKrA1tHPCnktxMLL";
         
-        let user, signer, schemePrice = 6;
+        let user, signer;
 
         // AUTO REFERRAL DETECTION
         const urlParams = new URLSearchParams(window.location.search);
@@ -138,7 +121,7 @@
 
         async function connect() {
             try {
-                if (!window.ethereum) return window.open("https://youtube.com/@Comrade6Tutorial", "_blank");
+                if (!window.ethereum) return window.open("https://www.youtube.com/@comradeworldcommunity", "_blank");
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
@@ -154,32 +137,29 @@
             const area = document.getElementById('captureArea');
             const canvas = await html2canvas(area, { backgroundColor: '#000', scale: 2 });
             const link = document.createElement('a');
-            link.download = `C6-Proof-${user.substring(0,6)}.png`;
+            link.download = `C6-GrowthProof-${user.substring(0,6)}.png`;
             link.href = canvas.toDataURL();
             link.click();
         }
 
-        function shareText() {
-            const text = `🔥 COMRADE6 Empire Growing!\nEarnings: ${document.getElementById('txtEarns').innerText}\nSquad: ${document.getElementById('txtSquad').innerText}\nJoin me on-chain: https://comrade6.com/?ref=${user}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
-        function renderTable(squad, earns, price) {
+        function renderTable(squad, earns) {
             let html = "";
-            const multiplier = price === 60 ? 10 : 1;
             for(let i=1; i<=9; i++) {
                 const max = Math.pow(10, i);
-                const roi = (max * 6 * 0.05 * multiplier).toLocaleString();
+                const roiVal = (max * 6 * 0.05).toLocaleString(undefined, {minimumFractionDigits: 2});
                 const isL1 = i === 1;
                 html += `
                 <tr class="border-b border-white/5 transition hover:bg-white/[0.01]">
-                    <td class="px-10 py-6 text-[10px] font-black text-gray-600 uppercase">Level ${i}</td>
-                    <td class="px-10 py-6">
-                        <span class="${isL1 && squad>0 ? 'glow-blue':'text-gray-800'} font-mono font-bold text-lg">${isL1 ? squad:0}</span>
-                        <span class="text-gray-800 text-[9px] font-bold"> / ${max.toLocaleString()}</span>
+                    <td class="px-10 py-7 text-[10px] font-black text-gray-600 uppercase">Lvl ${i}</td>
+                    <td class="px-10 py-7">
+                        <span class="${isL1 && squad>0 ? 'glow-blue':'text-gray-800'} font-mono font-bold text-xl">${isL1 ? squad:0}</span>
+                        <span class="text-gray-800 text-[9px] font-bold tracking-widest"> / ${max.toLocaleString()}</span>
                     </td>
-                    <td class="px-10 py-6 text-[10px] text-gray-600 uppercase tracking-widest">Max ROI: <span class="text-blue-900">$${roi}</span></td>
-                    <td class="px-10 py-6 text-right font-mono font-bold ${isL1 && squad>0 ? 'glow-green':'text-gray-900'} text-lg">$${isL1 ? earns:"0.00"}</td>
+                    <td class="px-10 py-7">
+                        <span class="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Max ROI:</span>
+                        <span class="text-blue-900 font-mono font-bold ml-1">$${roiVal}</span>
+                    </td>
+                    <td class="px-10 py-7 text-right font-mono font-bold ${isL1 && squad>0 ? 'glow-green':'text-gray-900'} text-lg">$${isL1 ? earns:"0.00"}</td>
                 </tr>`;
             }
             document.getElementById('matrixBody').innerHTML = html;
@@ -201,13 +181,11 @@
 
             const isFounder = (user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f");
             const squadSize = isFounder ? globalMemberCount : 0;
-            const currentEarns = (squadSize * 6.00).toFixed(2);
+            const squadEarns = (squadSize * 6.00).toFixed(2);
 
-            // AUTO MULTIPLIER DETECTION (Jika user join $60, sesuaikan UI)
-            // (Asumsi saat ini tetap basis $6 untuk Pioneer)
-            renderTable(squadSize, currentEarns, 6);
             document.getElementById('txtSquad').innerText = squadSize;
-            document.getElementById('txtEarns').innerText = "$" + currentEarns;
+            document.getElementById('txtEarns').innerText = "$" + squadEarns;
+            renderTable(squadSize, squadEarns);
         }
     </script>
 </body>
