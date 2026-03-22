@@ -106,53 +106,57 @@
             } catch (err) { console.error("Login Fail", err); }
         }
 
-        async function sync() {
+async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT
+                // 1. Ambil Saldo (Standar ERC20)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Data Matrix (Hard Bypass Manual Hex)
-                // selector users(address) = 0xa87430ba
-                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
-                
-                console.log("🕵️ Matrix Scan Active...");
-                
-                try {
-                    const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
-                    
-                    if (raw && raw !== "0x" && raw.length > 130) {
-                        // OFFSET Bedah Manual (Per 64 Karakter)
-                        // Karakter 130-194 = Earnings (USDT)
-                        // Karakter 194-258 = Team Size (Int)
-                        const eHex = "0x" + raw.substring(130, 194);
-                        const tHex = "0x" + raw.substring(194, 258);
-                        
-                        const eVal = ethers.utils.formatUnits(ethers.BigNumber.from(eHex), 6);
-                        const tVal = ethers.BigNumber.from(tHex).toString();
-                        
-                        console.log("✅ DATA TEMBUS:", tVal, eVal);
-                        render(tVal, eVal);
-                    } else {
-                        render("0", "0.00");
-                    }
-                } catch(e) {
-                    console.warn("Revert detected, rendering 0");
-                    render("0", "0.00");
-                }
-
-                // 3. Global Stats
-                try {
-                    const gHex = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
+                // 2. Ambil Global Squad (Selector: 0x16584090)
+                const gHex = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
+                if (gHex !== "0x") {
                     const gVal = ethers.BigNumber.from(gHex).toString();
                     document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
                     document.getElementById('globalCount').classList.remove('hidden');
-                } catch(e) {}
+                }
+
+                // 3. AMBIL DATA MATRIX (Logic Murni - Tanpa Tebakan)
+                // Selector users(address) = 0xa87430ba
+                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
+                
+                // Kita panggil mentahnya (Raw)
+                const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
+                
+                console.log("🔍 Kontrak Menjawab (Hex):", raw);
+
+                if (raw && raw !== "0x" && raw.length > 66) {
+                    // Bedah Hex Berdasarkan Standar ABI:
+                    // Data di Blockchain dikirim per 32 bytes (64 karakter)
+                    // [0-64] : Referrer Address
+                    // [64-128] : Package / ID
+                    // [128-192] : Total Earnings (USDT)
+                    // [192-256] : Team Size (Downline Level 1)
+                    
+                    // Kita ambil potongan 64 karakter ketiga (Earnings)
+                    const earnPart = "0x" + raw.substring(130, 194);
+                    // Kita ambil potongan 64 karakter keempat (Team Size)
+                    const teamPart = "0x" + raw.substring(194, 258);
+
+                    const finalEarns = ethers.utils.formatUnits(ethers.BigNumber.from(earnPart), 6);
+                    const finalTeam = ethers.BigNumber.from(teamPart).toString();
+
+                    console.log("📊 Hasil Bedah Kontrak:", { team: finalTeam, earns: finalEarns });
+                    render(finalTeam, finalEarns);
+                } else {
+                    console.warn("⚠️ Kontrak mengembalikan data kosong (User belum terdaftar).");
+                    render("0", "0.00");
+                }
 
             } catch (err) {
-                console.error("Critical Fail", err);
+                console.error("❌ Gagal Total Membaca Kontrak:", err);
+                render("0", "0.00");
             }
         }
 
