@@ -158,7 +158,7 @@
             document.getElementById('matrixBody').innerHTML = html;
         }
 
-        async function sync() {
+async function sync() {
             console.log("🕵️ Syncing Status...");
             const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
             const founderAddr = "0x31838e2fa16f364b54b8f3b186f3aeed68df816f".toLowerCase();
@@ -166,6 +166,7 @@
             
             let hasJoined = false;
             try {
+                // 1. CEK APAKAH USER SUDAH JOIN (Logic Hex)
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 const response = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                 if (response !== "0x" && response.length > 64) {
@@ -178,24 +179,28 @@
                 document.getElementById('doorEmpire').classList.remove('hidden');
                 document.getElementById('doorJoin').classList.add('hidden');
 
+                // 2. AMBIL SALDO USDT USER
                 const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                const storage0 = await alcProvider.getStorageAt(ADDR_CONTRACT, 0);
-                const rawGlobal = ethers.BigNumber.from(storage0).toNumber();
-                
-                // LOGIKA SQUAD & EARNING FOUNDER (001)
-                const realTotalUser = (rawGlobal > 0) ? rawGlobal - 1 : 0; 
-                const squadSize = isFounder ? realTotalUser : 0; 
+                // 3. AMBIL TOTAL USER LANGSUNG DARI VARIABEL KONTRAK (FIX 8 JADI 2)
+                const cCom = new ethers.Contract(ADDR_CONTRACT, ["function totalUsers() view returns (uint256)"], alcProvider);
+                const totalInContract = await cCom.totalUsers();
+                const totalGlobal = totalInContract.toNumber();
+
+                // Logika Squad: Jika ada 3 user (Founder, 002, 003), maka totalUsers = 3. 
+                // Squad Founder adalah totalUsers - 1 = 2.
+                const squadSize = isFounder ? (totalGlobal - 1) : 0; 
                 const totalEarned = (squadSize * 6.00).toFixed(2);
 
-                document.getElementById('globalCount').innerText = "Global Squad: " + realTotalUser;
+                document.getElementById('globalCount').innerText = "Global Squad: " + (totalGlobal - 1);
                 document.getElementById('globalCount').classList.remove('hidden');
                 document.getElementById('txtSquad').innerText = squadSize;
                 document.getElementById('txtEarns').innerText = "$" + totalEarned;
                 
                 renderTable(squadSize, totalEarned);
+                console.log("✅ Dashboard Synced. Squad Size:", squadSize);
             } else {
                 document.getElementById('doorEmpire').classList.add('hidden');
                 document.getElementById('doorJoin').classList.remove('hidden');
