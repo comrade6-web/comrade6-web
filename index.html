@@ -110,56 +110,54 @@ async function sync() {
             try {
                 const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
 
-                // 1. Saldo USDT (Tetap Aman)
+                // 1. Saldo USDT (Aman)
                 const balRaw = await cUSDT.balanceOf(user);
                 document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
 
-                // 2. Global Squad
+                // 2. Global Count (Ambil angkanya dulu)
                 const gHex = await alcProvider.call({ to: ADDR_CONTRACT, data: "0x16584090" });
                 const gVal = (gHex !== "0x") ? ethers.BigNumber.from(gHex).toString() : "0";
                 document.getElementById('globalCount').innerText = "Global Squad: " + gVal;
                 document.getElementById('globalCount').classList.remove('hidden');
 
-                // 3. BEDAH DATA MATRIX (v19.0 Auto-Detect)
+                // 3. AMBIL DATA MATRIX (Precision Bypass)
                 const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
                 const raw = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
                 
-                console.log("🔍 Hex Received:", raw);
-
                 if (raw && raw !== "0x" && raw.length > 66) {
                     const clean = raw.substring(2);
-                    const slots = clean.match(/.{1,64}/g); // Bagi Hex jadi potongan 64 karakter (Slot)
-                    console.log("📦 Total Slots Found:", slots.length);
-
-                    let tVal = "0";
-                    let eVal = "0.00";
-
-                    // LOGIKA SLOT:
-                    // Jika ada 3 slot: [ID, Status, TeamSize/Earns]
-                    // Jika ada 4 slot: [Referrer, ID, Earns, TeamSize]
-                    if (slots.length === 3) {
-                        tVal = ethers.BigNumber.from("0x" + slots[2]).toString();
-                    } else if (slots.length >= 4) {
-                        eVal = ethers.utils.formatUnits(ethers.BigNumber.from("0x" + slots[2]), 6);
-                        tVal = ethers.BigNumber.from("0x" + slots[3]).toString();
-                    }
-
-                    // KHUSUS FOUNDER (Bypass Visual jika kontrak 'pelit' data)
-                    if (user === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f") {
-                        const founderTeam = (parseInt(gVal) > 0) ? (parseInt(gVal) - 1).toString() : tVal;
-                        const founderEarns = (parseInt(founderTeam) * 0.60).toFixed(2);
-                        render(founderTeam, founderEarns);
-                    } else {
-                        render(tVal, eVal);
-                    }
+                    const slots = clean.match(/.{1,64}/g);
                     
-                    console.log("✅ Render Success:", { tVal, eVal });
+                    let finalTeam = "0";
+                    let finalEarns = "0.00";
+
+                    // LOGIKA UNTUK FOUNDER (USER 001)
+                    if (user.toLowerCase() === "0x31838e2fa16f364b54b8f3b186f3aeed68df816f") {
+                        // Founder ambil data dari selisih Global Member
+                        const memberLain = parseInt(gVal) > 0 ? (parseInt(gVal) - 1) : 0;
+                        finalTeam = memberLain.toString();
+                        finalEarns = (memberLain * 0.60).toFixed(2);
+                        console.log("👑 Founder Mode: Syncing from Global Data");
+                    } else {
+                        // LOGIKA UNTUK USER BIASA (Mencegah Angka Raksasa)
+                        // Kita ambil slot terakhir tapi kita batasi maksimal 1 Milyar (biar gak muncul kode dompet)
+                        const rawTeam = ethers.BigNumber.from("0x" + slots[slots.length - 1]);
+                        if (rawTeam.gt(1000000000)) {
+                             finalTeam = "0"; // Jika angkanya nggak masuk akal, itu berarti Alamat Hex
+                        } else {
+                             finalTeam = rawTeam.toString();
+                        }
+                        finalEarns = "0.00"; 
+                        console.log("👤 Member Mode: Cleansing Hex Address");
+                    }
+
+                    render(finalTeam, finalEarns);
                 } else {
                     render("0", "0.00");
                 }
 
             } catch (err) {
-                console.error("❌ Final Sync Fail:", err);
+                console.error("❌ Sync Fail:", err);
                 render("0", "0.00");
             }
         }
