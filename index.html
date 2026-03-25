@@ -91,7 +91,7 @@
     </section>
 
     <script>
-        const ADDR_CONTRACT = "0xC1e717690fF8B5820Af8C6a32ED6789805d4B366";
+        const ADDR_CONTRACT = "0x4DA4dFB966d05FB3a842eD9bee5DF188C8bb9856";
         const ADDR_USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const ALCHEMY_URL = "https://polygon-mainnet.g.alchemy.com/v2/1bCZHDKrA1tHPCnktxMLL";
         
@@ -159,53 +159,56 @@
         }
 
 async function sync() {
-            console.log("🕵️ Syncing Status...");
-            const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
-            const founderAddr = "0x31838e2fa16f364b54b8f3b186f3aeed68df816f".toLowerCase();
-            const isFounder = (user.toLowerCase() === founderAddr);
+    console.log("🕵️ Syncing Status V2...");
+    const alcProvider = new ethers.providers.JsonRpcProvider(ALCHEMY_URL);
+    const founderAddr = "0x31838e2fa16f364b54b8f3b186f3aeed68df816f".toLowerCase();
+    
+    let hasJoined = false;
+    try {
+        // 1. CEK REGISTRASI (Gunakan Contract Interface agar lebih stabil)
+        const cCom = new ethers.Contract(ADDR_CONTRACT, [
+            "function users(address) view returns (bool, bool, address)",
+            "function getUserReferrals(address) view returns (address[])",
+            "function totalUsers() view returns (uint256)"
+        ], alcProvider);
+
+        const userData = await cCom.users(user);
+        hasJoined = userData[0]; // isRegistered6
+
+        if (hasJoined || user.toLowerCase() === founderAddr) {
+            document.getElementById('doorEmpire').classList.remove('hidden');
+            document.getElementById('doorJoin').classList.add('hidden');
+
+            // 2. AMBIL SALDO USDT
+            const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
+            const balRaw = await cUSDT.balanceOf(user);
+            document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
+
+            // 3. AMBIL SQUAD SIZE NYATA (Bukan Estimasi Global)
+            const referrals = await cCom.getUserReferrals(user);
+            const squadSize = referrals.length; // JUMLAH REAL DI LEVEL 1 USER TERSEBUT
             
-            let hasJoined = false;
-            try {
-                // 1. CEK APAKAH USER SUDAH JOIN (Logic Hex)
-                const dataHex = "0xa87430ba" + user.replace("0x", "").toLowerCase().padStart(64, '0');
-                const response = await alcProvider.call({ to: ADDR_CONTRACT, data: dataHex });
-                if (response !== "0x" && response.length > 64) {
-                    const cleanData = response.replace("0x", "");
-                    if (!/^0+$/.test(cleanData)) hasJoined = true;
-                }
-            } catch (err) { console.error(err); }
+            // 4. AMBIL DATA GLOBAL (Hanya untuk counter atas)
+            const totalInContract = await cCom.totalUsers();
+            const totalGlobal = totalInContract.toNumber() - 1;
 
-            if (isFounder || hasJoined) {
-                document.getElementById('doorEmpire').classList.remove('hidden');
-                document.getElementById('doorJoin').classList.add('hidden');
-
-                // 2. AMBIL SALDO USDT USER
-                const cUSDT = new ethers.Contract(ADDR_USDT, ["function balanceOf(address) view returns (uint256)"], alcProvider);
-                const balRaw = await cUSDT.balanceOf(user);
-                document.getElementById('txtBal').innerText = "$" + parseFloat(ethers.utils.formatUnits(balRaw, 6)).toFixed(2);
-
-                // 3. AMBIL TOTAL USER LANGSUNG DARI VARIABEL KONTRAK (FIX 8 JADI 2)
-                const cCom = new ethers.Contract(ADDR_CONTRACT, ["function totalUsers() view returns (uint256)"], alcProvider);
-                const totalInContract = await cCom.totalUsers();
-                const totalGlobal = totalInContract.toNumber();
-
-                // Logika Squad: Jika ada 3 user (Founder, 002, 003), maka totalUsers = 3. 
-                // Squad Founder adalah totalUsers - 1 = 2.
-                const squadSize = isFounder ? (totalGlobal - 1) : 0; 
-                const totalEarned = (squadSize * 6.00).toFixed(2);
-
-                document.getElementById('globalCount').innerText = "Global Squad: " + (totalGlobal - 1);
-                document.getElementById('globalCount').classList.remove('hidden');
-                document.getElementById('txtSquad').innerText = squadSize;
-                document.getElementById('txtEarns').innerText = "$" + totalEarned;
-                
-                renderTable(squadSize, totalEarned);
-                console.log("✅ Dashboard Synced. Squad Size:", squadSize);
-            } else {
-                document.getElementById('doorEmpire').classList.add('hidden');
-                document.getElementById('doorJoin').classList.remove('hidden');
-            }
+            // Update UI
+            document.getElementById('globalCount').innerText = "Global Squad: " + totalGlobal;
+            document.getElementById('globalCount').classList.remove('hidden');
+            document.getElementById('txtSquad').innerText = squadSize;
+            
+            // Estimasi Earnings (Sederhana: Lvl 1 x $0.30)
+            const totalEarned = (squadSize * 0.30).toFixed(2); 
+            document.getElementById('txtEarns').innerText = "$" + totalEarned;
+            
+            renderTable(squadSize, totalEarned);
+            console.log("✅ V2 Dashboard Synced. Your Squad:", squadSize);
+        } else {
+            document.getElementById('doorEmpire').classList.add('hidden');
+            document.getElementById('doorJoin').classList.remove('hidden');
         }
+    } catch (err) { console.error("Sync Error:", err); }
+}
     </script>
 </body>
 </html>
